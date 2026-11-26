@@ -611,11 +611,18 @@ function initLiquidChromeSculpture() {
   let rafId = null;
   let lastTouchTime = 0;
 
-  // Pre-build quantized unit-space gradients once (zero per-frame gradient/string allocations)
+  // Pre-render quantized chrome disc sprites & radial bloom once (zero per-frame gradient/path tessellation)
   const GRAD_BUCKETS = 13;
-  const unitGradients = Array.from({ length: GRAD_BUCKETS }, (_, b) => {
+  const SPRITE_SIZE = 64;
+  const SPRITE_HALF = SPRITE_SIZE / 2;
+  const SPRITE_R = SPRITE_HALF - 1;
+  const discSprites = Array.from({ length: GRAD_BUCKETS }, (_, b) => {
+    const off = document.createElement('canvas');
+    off.width = SPRITE_SIZE;
+    off.height = SPRITE_SIZE;
+    const octx = off.getContext('2d');
     const specPos = 0.2 + (b / (GRAD_BUCKETS - 1)) * 0.6;
-    const g = ctx.createLinearGradient(-1, -1, 1, 1);
+    const g = octx.createLinearGradient(0, 0, SPRITE_SIZE, SPRITE_SIZE);
     g.addColorStop(0, '#07050c');
     g.addColorStop(Math.max(0.05, specPos - 0.24), '#3b0764');
     g.addColorStop(Math.max(0.08, specPos - 0.1), '#a855f7');
@@ -624,8 +631,30 @@ function initLiquidChromeSculpture() {
     g.addColorStop(Math.min(0.92, specPos + 0.09), '#c084fc');
     g.addColorStop(Math.min(0.96, specPos + 0.25), '#581c87');
     g.addColorStop(1, '#090710');
-    return g;
+    octx.fillStyle = g;
+    octx.beginPath();
+    octx.arc(SPRITE_HALF, SPRITE_HALF, SPRITE_R, 0, Math.PI * 2);
+    octx.fill();
+    if (!isCoarse) {
+      octx.strokeStyle = 'rgba(216, 180, 254, 0.24)';
+      octx.lineWidth = 1.25;
+      octx.stroke();
+    }
+    return off;
   });
+
+  const BLOOM_SIZE = 128;
+  const BLOOM_HALF = BLOOM_SIZE / 2;
+  const bloomSprite = document.createElement('canvas');
+  bloomSprite.width = BLOOM_SIZE;
+  bloomSprite.height = BLOOM_SIZE;
+  const bctx = bloomSprite.getContext('2d');
+  const bg = bctx.createRadialGradient(BLOOM_HALF, BLOOM_HALF, 4, BLOOM_HALF, BLOOM_HALF, BLOOM_HALF);
+  bg.addColorStop(0, 'rgba(192, 132, 252, 0.34)');
+  bg.addColorStop(0.45, 'rgba(126, 34, 206, 0.18)');
+  bg.addColorStop(1, 'rgba(5, 5, 7, 0)');
+  bctx.fillStyle = bg;
+  bctx.fillRect(0, 0, BLOOM_SIZE, BLOOM_SIZE);
 
   const pointer = {
     x: 0.3,
@@ -742,20 +771,17 @@ function initLiquidChromeSculpture() {
     const cy = canvasHeight * 0.5 + pointer.y * 14;
     const scale = Math.min(containerWidth, containerHeight) * 0.29;
     const maxBloomR = Math.min(canvasWidth, canvasHeight) * 0.46;
+    const bloomR = Math.min(maxBloomR, scale * (1.42 + pointer.velocity * 0.14));
 
-    const bloom = ctx.createRadialGradient(
-      cx + pointer.x * 32,
-      cy + pointer.y * 32,
-      scale * 0.06,
-      cx,
-      cy,
-      Math.min(maxBloomR, scale * (1.42 + pointer.velocity * 0.14))
+    ctx.globalAlpha = Math.min(1, 0.78 + pointer.velocity * 0.22);
+    ctx.drawImage(
+      bloomSprite,
+      cx + pointer.x * 16 - bloomR,
+      cy + pointer.y * 16 - bloomR,
+      bloomR * 2,
+      bloomR * 2
     );
-    bloom.addColorStop(0, `rgba(192, 132, 252, ${0.26 + pointer.velocity * 0.14})`);
-    bloom.addColorStop(0.45, 'rgba(126, 34, 206, 0.18)');
-    bloom.addColorStop(1, 'rgba(5, 5, 7, 0)');
-    ctx.fillStyle = bloom;
-    ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+    ctx.globalAlpha = 1;
 
     let rippleDeform = 0;
     for (let r = ripples.length - 1; r >= 0; r--) {
@@ -810,20 +836,13 @@ function initLiquidChromeSculpture() {
       ctx.save();
       ctx.translate(px, py);
       ctx.rotate(angle);
-      ctx.scale(ribbonWidth, ribbonThickness);
-
-      ctx.fillStyle = unitGradients[bucket];
-      ctx.beginPath();
-      ctx.arc(0, 0, 1, 0, Math.PI * 2);
-      ctx.fill();
-
-      if (strokeStyle) {
-        ctx.scale(1 / ribbonWidth, 1 / ribbonThickness);
-        ctx.strokeStyle = strokeStyle;
-        ctx.lineWidth = 0.85;
-        ctx.stroke();
-      }
-
+      ctx.drawImage(
+        discSprites[bucket],
+        -ribbonWidth,
+        -ribbonThickness,
+        ribbonWidth * 2,
+        ribbonThickness * 2
+      );
       ctx.restore();
     }
 
