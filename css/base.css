@@ -16,9 +16,14 @@ html {
   color: var(--ink-primary);
   font-size: 16px;
   -webkit-text-size-adjust: 100%;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: clip;
 }
 
 body {
+  width: 100%;
+  max-width: 100%;
   min-height: 100vh;
   background-color: var(--bg-void);
   color: var(--ink-primary);
@@ -26,7 +31,7 @@ body {
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  overflow-x: hidden;
+  overflow-x: clip;
   position: relative;
 }
 
@@ -148,6 +153,13 @@ img {
 .site-footer {
   position: relative;
   z-index: 10;
+  width: 100%;
+  max-width: 100%;
+}
+
+.site-main,
+.site-footer {
+  overflow-x: clip;
 }
 
 /* Layout Containers */
@@ -155,13 +167,15 @@ img {
   width: 100%;
   max-width: var(--container-max);
   margin-inline: auto;
-  padding-inline: var(--gutter-x);
+  padding-left: max(var(--gutter-x), env(safe-area-inset-left));
+  padding-right: max(var(--gutter-x), env(safe-area-inset-right));
 }
 
 .section-block {
   padding-block: var(--section-pad-y);
   border-top: 1px solid var(--border-hairline);
   scroll-margin-top: 5.5rem;
+  overflow-x: clip;
 }
 
 /* Subtle Translucent Obsidian Reading Sheet for Crisp Legibility Over Liquid Silk */

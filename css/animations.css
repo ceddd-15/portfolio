@@ -470,6 +470,10 @@
     animation-name: modalSheet;
   }
 
+  .kinetic-slide-right {
+    animation-name: fadeUp;
+  }
+
   .reveal-section[data-reveal='left'] {
     --reveal-x: -26px;
   }

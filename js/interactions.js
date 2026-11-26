@@ -112,16 +112,83 @@ function initScrollMechanics() {
   const navLinks = document.querySelectorAll('.nav-link');
   const mobileLinks = document.querySelectorAll('.mobile-nav-link[data-nav-target]');
   const navShell = document.querySelector('.obsidian-pill-nav');
+  const siteHeader = document.querySelector('.site-header');
   const sectionIds = ['projects', 'skills', 'notes', 'education'];
   const timelineContainer = document.getElementById('timeline-container');
   const eduRail = document.getElementById('education-scroll-rail');
   const sculpture = document.getElementById('chrome-sculpture-container');
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const occluderSelector = [
+    '.hero-eyebrow',
+    '.hero-headline',
+    '.hero-lead',
+    '.hero-actions',
+    '.hero-metrics',
+    '.eyebrow',
+    '.section-title',
+    '.section-subtitle',
+    '.header-hint',
+    '.filter-bar',
+    '.index-list-meta',
+    '.project-title',
+    '.project-meta',
+    '.project-desc',
+    '.project-stack',
+    '.skill-title',
+    '.skill-item',
+    '.note-title',
+    '.note-body',
+    '.timeline-title',
+    '.timeline-meta',
+    '.timeline-detail',
+    '.timeline-bullet'
+  ].join(', ');
 
   let activeId = null;
   let locked = false;
   let lockTimer = null;
   let ticking = false;
+
+  function rectsOverlap(a, b, padY = 4) {
+    return a.bottom > b.top - padY && a.top < b.bottom + padY && a.right > b.left && a.left < b.right;
+  }
+
+  function updateNavContrast(scrollY) {
+    if (!navShell) return;
+    const nr = navShell.getBoundingClientRect();
+    let overSurface = scrollY > 36;
+    if (!overSurface) {
+      const surfaces = document.querySelectorAll('.section-glass-surface');
+      for (const surf of surfaces) {
+        if (rectsOverlap(surf.getBoundingClientRect(), nr, 2)) {
+          overSurface = true;
+          break;
+        }
+      }
+    }
+
+    let isOccluding = false;
+    const occluders = document.querySelectorAll(occluderSelector);
+    for (const el of occluders) {
+      if (el.offsetParent === null) continue;
+      const r = el.getBoundingClientRect();
+      if (r.width === 0 || r.height === 0) continue;
+      if (!rectsOverlap(r, nr, 5)) continue;
+      const sec = el.closest('.reveal-section');
+      if (sec && !sec.classList.contains('is-visible')) {
+        const op = parseFloat(window.getComputedStyle(sec).opacity);
+        if (Number.isFinite(op) && op <= 0.08) continue;
+      }
+      isOccluding = true;
+      break;
+    }
+
+    navShell.classList.toggle('is-over-surface', overSurface);
+    navShell.classList.toggle('is-occluding', isOccluding);
+    if (siteHeader) {
+      siteHeader.classList.toggle('is-occluding', isOccluding);
+    }
+  }
 
   // Layout-based offset (ignores reveal transforms so targets stay pixel-precise)
   function absTop(el) {
@@ -205,6 +272,8 @@ function initScrollMechanics() {
     const pct = docHeight > 0 ? Math.min(100, Math.max(0, (y / docHeight) * 100)) : 0;
 
     if (progressBar) progressBar.style.width = `${pct.toFixed(2)}%`;
+
+    updateNavContrast(y);
 
     if (!locked) {
       const found = detectSection();
@@ -301,6 +370,20 @@ function initScrollMechanics() {
       }, 250);
     });
   }
+
+  document.addEventListener('transitionend', (e) => {
+    if (e.target.classList && e.target.classList.contains('reveal-section')) {
+      updateNavContrast(window.scrollY || document.documentElement.scrollTop);
+    }
+  });
+
+  document.addEventListener('click', (e) => {
+    if (e.target.closest('.filter-tab')) {
+      requestAnimationFrame(() => {
+        updateNavContrast(window.scrollY || document.documentElement.scrollTop);
+      });
+    }
+  });
 
   updateScrollUI();
 }
