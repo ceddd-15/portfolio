@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Josh Cedrick M. Corpuz (ceddd-15) — Developer Portfolio</title>
+  <link
+    rel="icon"
+    type="image/svg+xml"
+    href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%23ffffff'/%3E%3Cstop offset='50%25' stop-color='%23a855f7'/%3E%3Cstop offset='100%25' stop-color='%233b0764'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='32' cy='32' r='30' fill='%23050507' stroke='url(%23g)' stroke-width='4'/%3E%3Ctext x='32' y='39' text-anchor='middle' font-family='sans-serif' font-weight='700' font-size='22' fill='%23f6f3fc'%3EJC%3C/text%3E%3C/svg%3E"
+  />
+  <meta
+    name="description"
+    content="Developer portfolio of Josh Cedrick M. Corpuz (ceddd-15), Bachelor of Computer Science student at CIIT College of Innovation and Integrated Technology."
+  />
+
+  <!-- Typography: Space Grotesk, Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap"
+    rel="stylesheet"
+  />
+
+  <!-- Modular Zero-Bundler Stylesheets -->
+  <link rel="stylesheet" href="css/tokens.css" />
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/components.css" />
+  <link rel="stylesheet" href="css/animations.css" />
+  <link rel="stylesheet" href="css/print.css" media="print" />
+</head>
+<body>
+  <!-- Full-Viewport Procedural Liquid Obsidian & Violet-Chrome Silk Canvas -->
+  <canvas id="liquid-bg-canvas" aria-hidden="true"></canvas>
+  <div class="ambient-readability-veil" aria-hidden="true"></div>
+  <div id="cursor-ambient-glow" aria-hidden="true"></div>
+
+  <!-- Top Scroll-Progress Violet-Chrome Hairline Bar -->
+  <div class="scroll-progress-track" aria-hidden="true">
+    <div id="scroll-progress-bar" class="scroll-progress-bar"></div>
+  </div>
+
+  <!-- =======================================================================
+       FLOATING OBSIDIAN-GLASS PILL NAVBAR
+       ======================================================================= -->
+  <header class="site-header">
+    <div class="nav-shell">
+      <div class="obsidian-pill-nav specular-hover">
+        <a href="#top" data-magnetic class="brand-link magnetic-btn">
+          <span class="brand-monogram-ring">
+            <span class="brand-monogram">JC</span>
+          </span>
+          <span class="brand-handle">ceddd-15</span>
+        </a>
+
+        <nav id="desktop-nav" aria-label="Primary Navigation" class="desktop-nav">
+          <span id="nav-active-pill" class="nav-active-pill" aria-hidden="true"></span>
+          <a href="#projects" data-nav-target="projects" class="nav-link">Projects</a>
+          <a href="#skills" data-nav-target="skills" class="nav-link">Skills</a>
+          <a href="#notes" data-nav-target="notes" class="nav-link">Notes</a>
+          <a href="#education" data-nav-target="education" class="nav-link">Education</a>
+        </nav>
+
+        <div class="nav-actions">
+          <a
+            href="https://github.com/ceddd-15"
+            target="_blank"
+            rel="noopener noreferrer"
+            data-magnetic
+            aria-label="GitHub Profile (@ceddd-15)"
+            title="GitHub (@ceddd-15)"
+            class="icon-pill-btn magnetic-btn"
+          >
+            <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path
+                fill-rule="evenodd"
+                d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"
+                clip-rule="evenodd"
+              ></path>
+            </svg>
+          </a>
+
+          <button type="button" data-open-cv data-magnetic class="btn-chrome-solid magnetic-btn">
+            Resume / CV
+          </button>
+
+          <button
+            id="mobile-menu-btn"
+            type="button"
+            aria-expanded="false"
+            aria-controls="mobile-menu"
+            aria-label="Toggle Navigation Menu"
+            class="icon-pill-btn mobile-menu-btn"
+          >
+            <svg id="menu-open-icon" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4 7h16M4 12h16M4 17h16"></path>
+            </svg>
+            <svg id="menu-close-icon" class="hidden" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Mobile Dropdown Menu -->
+      <nav id="mobile-menu" aria-label="Mobile Navigation" class="mobile-menu-panel hidden">
+        <a href="#projects" class="mobile-nav-link">Projects</a>
+        <a href="#skills" class="mobile-nav-link">Skills</a>
+        <a href="#notes" class="mobile-nav-link">Notes</a>
+        <a href="#education" class="mobile-nav-link">Education</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="top" class="site-main">
+    <!-- =====================================================================
+         HERO SECTION (OPEN NEGATIVE SPACE OVER LIQUID CHROME SILK)
+         ===================================================================== -->
+    <section class="hero-section">
+      <div class="container">
+        <div class="hero-grid">
+          <div class="hero-copy">
+            <div class="hero-eyebrow kinetic-enter kinetic-delay-1">
+              <span class="status-dot pulse-dot" aria-hidden="true"></span>
+              <span>BS Computer Science &middot; CIIT &middot; Antipolo, PH</span>
+            </div>
+
+            <h1 class="hero-headline kinetic-enter kinetic-delay-2">
+              <span class="chrome-metallic-text chrome-sheen-animate">JOSH CEDRICK</span>
+              <span class="chrome-violet-text chrome-sheen-animate">M. CORPUZ</span>
+            </h1>
+
+            <p class="hero-summary kinetic-enter kinetic-delay-3">
+              Intermediate web and application developer building full-stack web apps, C++ systems,
+              mobile software, and hardware prototypes. Focused on clean architecture, reliable
+              backend logic, and cross-platform implementation.
+            </p>
+
+            <div class="hero-cta-row kinetic-enter kinetic-delay-4">
+              <a href="#projects" data-magnetic class="btn-violet-primary magnetic-btn">
+                <span>Explore Projects</span>
+                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
+                </svg>
+              </a>
+
+              <button type="button" data-open-cv data-magnetic class="btn-obsidian-outline magnetic-btn specular-hover">
+                <span>Resume / CV</span>
+              </button>
+            </div>
+
+            <!-- Open Horizontal Hairline Metric Strip -->
+            <div class="hero-metrics kinetic-enter kinetic-delay-5">
+              <div class="metric-cell">
+                <div id="hero-project-count" class="metric-value">10</div>
+                <div class="metric-label">Projects</div>
+              </div>
+              <div class="metric-cell">
+                <div class="metric-value">2 Yrs</div>
+                <div class="metric-label">Web &amp; App Dev</div>
+              </div>
+              <div class="metric-cell">
+                <div class="metric-value accent">3.28</div>
+                <div class="metric-label">CIIT GPA</div>
+              </div>
+              <div class="metric-cell">
+                <div class="metric-value">CESCON</div>
+                <div class="metric-label">Hardware</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Minimal Obsidian-Glass Interactive Preview Launcher Rail -->
+          <aside class="hero-studio-panel specular-hover kinetic-enter kinetic-delay-4" aria-label="Featured Interactive Previews">
+            <div class="studio-panel-header">
+              <span class="studio-panel-title">Interactive Previews</span>
+              <span class="studio-panel-tag">03 Live Sandboxes</span>
+            </div>
+            <div id="hero-studio-previews" class="studio-preview-list"></div>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <!-- =====================================================================
+         SECTION 01: PROJECTS & REPOSITORIES (OPEN 1PX HAIRLINE INDEX 01–10)
+         ===================================================================== -->
+    <section id="projects" class="section-block reveal-section">
+      <div class="container">
+        <div class="section-glass-surface">
+          <div class="projects-header">
+            <div class="section-heading-group">
+              <p class="eyebrow">01 // Selected Work</p>
+              <h2 class="section-title">Projects &amp; Repositories</h2>
+              <p class="section-subtitle">
+                Ten validated software, web, mobile, and hardware builds organized in an open hairline
+                index—filter by domain, inspect repositories, or launch interactive live previews.
+              </p>
+            </div>
+
+            <!-- Sliding-Pill Category Filter Bar (Rendered dynamically from data/projects.js) -->
+            <div id="project-filters" role="tablist" aria-label="Filter Projects" class="filter-bar"></div>
+          </div>
+
+          <div class="index-list-meta">
+            <span id="index-list-label" class="index-list-label">Repository Index &middot; 10 Builds</span>
+            <span>Click any row to inspect</span>
+          </div>
+
+          <div id="projects-index-list" class="projects-index-list"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =====================================================================
+         SECTION 02: TECHNICAL SKILLS LEDGER (EXACT CV PROFICIENCY TIERS)
+         ===================================================================== -->
+    <section id="skills" class="section-block reveal-section">
+      <div class="container">
+        <div class="section-glass-surface">
+          <div class="section-header-split">
+            <div class="section-heading-group">
+              <p class="eyebrow">02 // Technical Stack</p>
+              <h2 class="section-title">Technical Skills</h2>
+            </div>
+            <p class="header-hint">Click any skill pill to trace linked projects</p>
+          </div>
+
+          <div id="skills-ledger-grid" class="skills-grid"></div>
+
+          <!-- Collapsible Linked Projects Drawer -->
+          <div id="skill-linked-drawer" class="smooth-collapse">
+            <div class="smooth-collapse-inner">
+              <div class="skill-drawer-content">
+                <div class="skill-drawer-header">
+                  <div class="skill-drawer-title">
+                    <span class="status-dot" aria-hidden="true"></span>
+                    <span>Projects using</span>
+                    <strong id="selected-skill-name">C++</strong>
+                  </div>
+                  <button id="clear-skill-btn" type="button" class="skill-clear-btn">
+                    Clear &times;
+                  </button>
+                </div>
+                <div id="skill-linked-projects" class="skill-linked-list"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =====================================================================
+         SECTION 03: ENGINEERING BUILD NOTES ACCORDION (VERBATIM)
+         ===================================================================== -->
+    <section id="notes" class="section-block reveal-section">
+      <div class="container">
+        <div class="section-glass-surface">
+          <div class="section-heading-group">
+            <p class="eyebrow">03 // Engineering Log</p>
+            <h2 class="section-title">Build Notes</h2>
+            <p class="section-subtitle">
+              Practical notes from porting software runtimes, assembling convention hardware, and
+              stabilizing multiplayer game builds.
+            </p>
+          </div>
+
+          <div id="notes-accordion-list" class="notes-list"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =====================================================================
+         SECTION 04: EDUCATION & EXPERIENCE TIMELINE (SCROLL-ANIMATED RAIL)
+         ===================================================================== -->
+    <section id="education" class="section-block reveal-section">
+      <div class="container">
+        <div class="section-glass-surface">
+          <div class="section-heading-group">
+            <p class="eyebrow">04 // Background</p>
+            <h2 class="section-title">Education &amp; Experience</h2>
+          </div>
+
+          <div id="timeline-container" class="timeline-grid">
+            <div class="timeline-col">
+              <div class="timeline-col-label">Education</div>
+              <div class="timeline-rail-wrap">
+                <div class="timeline-base-rail" aria-hidden="true"></div>
+                <div id="education-scroll-rail" class="timeline-fill-rail" aria-hidden="true"></div>
+                <div id="education-entries" style="display:flex;flex-direction:column;gap:2.15rem;"></div>
+              </div>
+            </div>
+
+            <div class="timeline-col timeline-col-spaced">
+              <div class="timeline-col">
+                <div class="timeline-col-label">Experience</div>
+                <div class="timeline-rail-wrap">
+                  <div class="timeline-exp-rail" aria-hidden="true"></div>
+                  <div id="experience-entries"></div>
+                </div>
+              </div>
+
+              <div class="cv-callout-bar">
+                <span class="header-hint">Single-page formatted document</span>
+                <button type="button" data-open-cv data-magnetic class="btn-chrome-solid magnetic-btn">
+                  Open Print-Ready CV
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- =======================================================================
+       MINIMAL FOOTER
+       ======================================================================= -->
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <div class="footer-brand">
+        <strong>Josh Cedrick M. Corpuz</strong>
+        <span aria-hidden="true">&middot;</span>
+        <span>ceddd-15</span>
+      </div>
+
+      <div class="footer-links">
+        <button
+          type="button"
+          data-copy-text="josh.corpuz@ciit.edu.ph"
+          data-copy-label="Copied email address"
+        >
+          josh.corpuz@ciit.edu.ph
+        </button>
+        <a href="https://github.com/ceddd-15" target="_blank" rel="noopener noreferrer">
+          github.com/ceddd-15
+        </a>
+        <button type="button" data-open-cv>Resume / CV</button>
+      </div>
+    </div>
+  </footer>
+
+  <!-- =======================================================================
+       MODAL A: PROJECT DETAILS & INTERACTIVE LIVE PREVIEW MODAL
+       ======================================================================= -->
+  <div
+    id="inspect-modal"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="inspect-modal-title"
+    class="modal-backdrop hidden"
+  >
+    <div id="inspect-modal-panel" class="modal-panel">
+      <div class="modal-header">
+        <div class="modal-meta">
+          <span id="inspect-index" class="modal-meta-index">01</span>
+          <span class="modal-meta-sep">/</span>
+          <span id="inspect-category" class="modal-meta-cat">Category</span>
+        </div>
+
+        <div class="modal-header-right">
+          <div id="inspect-modal-tabs" role="tablist" aria-label="Project Inspection View" class="modal-tab-group hidden">
+            <button
+              id="inspect-tab-overview"
+              type="button"
+              role="tab"
+              aria-selected="true"
+              class="modal-tab-btn is-active"
+            >
+              Overview
+            </button>
+            <button
+              id="inspect-tab-preview"
+              type="button"
+              role="tab"
+              aria-selected="false"
+              class="modal-tab-btn"
+            >
+              <span class="preview-badge-dot" aria-hidden="true"></span>
+              <span>Live Preview</span>
+            </button>
+          </div>
+
+          <button
+            id="close-inspect-modal"
+            type="button"
+            aria-label="Close Project Details"
+            class="icon-pill-btn"
+          >
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="modal-body">
+        <div>
+          <h3 id="inspect-modal-title" class="modal-title">Project Title</h3>
+          <p id="inspect-role" class="modal-role">Role</p>
+        </div>
+
+        <!-- Tab Pane 1: Overview -->
+        <div id="inspect-overview-pane" style="display:flex;flex-direction:column;gap:1.35rem;">
+          <div>
+            <div class="modal-field-label">Contribution &amp; Scope</div>
+            <p id="inspect-summary" class="modal-summary"></p>
+          </div>
+
+          <div>
+            <div class="modal-field-label">Technologies</div>
+            <div id="inspect-stack" class="modal-stack-list"></div>
+          </div>
+        </div>
+
+        <!-- Tab Pane 2: Interactive Live Preview Stage -->
+        <div id="inspect-preview-pane" class="hidden"></div>
+
+        <div class="modal-footer-bar">
+          <span id="inspect-repo-text" class="modal-repo-url">github.com/ceddd-15</span>
+          <div class="modal-footer-actions">
+            <button id="copy-inspect-repo" type="button" class="btn-copy-repo">
+              Copy Repo URL
+            </button>
+            <a
+              id="inspect-repo-link"
+              href="https://github.com/ceddd-15"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="btn-chrome-solid"
+            >
+              <span>GitHub</span>
+              <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3"></path>
+              </svg>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =======================================================================
+       MODAL B: PRINT-READY CV MODAL (EXACT VERBATIM CV)
+       ======================================================================= -->
+  <div
+    id="cv-modal"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="cv-modal-heading"
+    class="modal-backdrop hidden"
+  >
+    <div id="cv-modal-panel" class="modal-panel modal-panel-cv">
+      <div class="modal-header no-print">
+        <span class="modal-meta-cat font-mono" style="font-size:0.75rem;">
+          Curriculum Vitae &middot; Print-Ready
+        </span>
+        <div class="modal-header-right">
+          <button id="print-cv-btn" type="button" class="btn-chrome-solid">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"
+              ></path>
+            </svg>
+            <span>Print / Save PDF</span>
+          </button>
+
+          <button
+            id="close-cv-modal"
+            type="button"
+            aria-label="Close CV Modal"
+            class="icon-pill-btn"
+          >
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Verbatim CV Sheet (Rendered from data/cv.js) -->
+      <div id="cv-printable-sheet" class="cv-sheet"></div>
+    </div>
+  </div>
+
+  <!-- Non-Intrusive Toast Notification -->
+  <div id="toast-notification" role="status" aria-live="polite" class="toast-notification">
+    <span id="toast-message">Copied to clipboard</span>
+  </div>
+
+  <!-- Native ES Module Entry Point -->
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

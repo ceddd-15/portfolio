@@ -1,0 +1,81 @@
+/* ==========================================================================
+   DESIGN TOKENS — Liquid Obsidian & Iridescent Violet-Chrome Studio System
+   ========================================================================== */
+
+:root {
+  color-scheme: dark;
+
+  /* Void & Obsidian Surfaces */
+  --bg-void: #050507;
+  --bg-obsidian: #0b0912;
+  --bg-obsidian-elevated: #110d1b;
+  --glass-bg: rgba(9, 7, 15, 0.66);
+  --glass-bg-strong: rgba(10, 8, 17, 0.84);
+  --glass-bg-subtle: rgba(9, 7, 15, 0.44);
+  --glass-blur: 18px;
+  --glass-blur-strong: 24px;
+
+  /* Typography Ink Hierarchy */
+  --ink-primary: #f6f3fc;
+  --ink-secondary: #b7aec9;
+  --ink-muted: #8b81a0;
+  --ink-inverse: #050507;
+
+  /* Liquid Violet-Chrome Palette (Sampled from Reference Silk Folds) */
+  --violet-abyss: #1e0838;
+  --violet-deep: #3b0764;
+  --violet-mid: #5b21b6;
+  --violet-core: #7e22ce;
+  --violet-electric: #9333ea;
+  --violet-vivid: #a855f7;
+  --violet-chrome: #c084fc;
+  --violet-lavender: #d8b4fe;
+  --violet-specular: #e9d5ff;
+  --chrome-white: #ffffff;
+
+  /* Hairline & Specular Borders */
+  --border-hairline: rgba(216, 180, 254, 0.14);
+  --border-specular: rgba(216, 180, 254, 0.16);
+  --border-specular-strong: rgba(233, 213, 255, 0.36);
+  --border-hover: rgba(192, 132, 252, 0.52);
+
+  /* Semantic Status Accents (Previews & Telemetry) */
+  --status-live: #4ade80;
+  --status-amber: #fbbf24;
+  --status-rose: #f472b6;
+  --status-cyan: #67e8f9;
+
+  /* Typography Families */
+  --font-display: 'Space Grotesk', 'Inter', system-ui, -apple-system, sans-serif;
+  --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  /* Layout & Spacing */
+  --container-max: 72rem;
+  --nav-max: 56rem;
+  --section-pad-y: clamp(4.25rem, 7vw, 6.25rem);
+  --gutter-x: clamp(1rem, 3.2vw, 2rem);
+
+  /* Radii */
+  --radius-sm: 0.5rem;
+  --radius-md: 0.875rem;
+  --radius-lg: 1.25rem;
+  --radius-xl: 1.5rem;
+  --radius-pill: 9999px;
+
+  /* Motion Curves */
+  --ease-expo: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+  --dur-fast: 180ms;
+  --dur-base: 280ms;
+  --dur-slow: 640ms;
+
+  /* Elevation & Glows */
+  --shadow-glass: 0 20px 50px -16px rgba(0, 0, 0, 0.9),
+    inset 0 1px 0 0 rgba(233, 213, 255, 0.18);
+  --shadow-modal: 0 30px 80px -12px rgba(0, 0, 0, 0.95),
+    0 0 0 1px rgba(216, 180, 254, 0.22),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.16);
+  --glow-violet: 0 0 28px -6px rgba(147, 51, 234, 0.65);
+  --glow-specular: 0 0 16px rgba(216, 180, 254, 0.45);
+}

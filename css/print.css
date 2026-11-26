@@ -1,0 +1,109 @@
+/* ==========================================================================
+   PRINT STYLESHEET — Isolated Single-Page Black-on-White Curriculum Vitae
+   ========================================================================== */
+
+@media print {
+  @page {
+    margin: 13mm;
+    size: auto;
+  }
+
+  html,
+  body {
+    background: #ffffff !important;
+    color: #09090b !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
+    height: auto !important;
+  }
+
+  /* Hide canvas, ambient layers, site chrome, and non-CV elements */
+  body > *:not(#cv-modal) {
+    display: none !important;
+  }
+
+  #cv-modal {
+    display: block !important;
+    position: static !important;
+    inset: auto !important;
+    background: #ffffff !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    overflow: visible !important;
+    width: 100% !important;
+    height: auto !important;
+  }
+
+  #cv-modal-panel {
+    background: #ffffff !important;
+    color: #09090b !important;
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
+    animation: none !important;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  #cv-printable-sheet {
+    background: #ffffff !important;
+    color: #09090b !important;
+    padding: 0 !important;
+    max-height: none !important;
+    overflow: visible !important;
+    gap: 1rem !important;
+  }
+
+  #cv-printable-sheet * {
+    color: #09090b !important;
+    border-color: #18181b !important;
+    background: transparent !important;
+    text-shadow: none !important;
+    box-shadow: none !important;
+  }
+
+  #cv-printable-sheet .cv-sheet-header {
+    flex-direction: row !important;
+    align-items: flex-end !important;
+    justify-content: space-between !important;
+    padding-bottom: 0.75rem !important;
+  }
+
+  #cv-printable-sheet .cv-contact {
+    text-align: right !important;
+  }
+
+  #cv-printable-sheet .cv-entry-row {
+    flex-direction: row !important;
+    align-items: baseline !important;
+    justify-content: space-between !important;
+  }
+
+  #cv-printable-sheet .cv-name {
+    font-size: 20pt !important;
+  }
+
+  #cv-printable-sheet .cv-section-title {
+    font-size: 9pt !important;
+    letter-spacing: 0.14em !important;
+  }
+
+  #cv-printable-sheet .cv-summary-text,
+  #cv-printable-sheet .cv-entry-strong,
+  #cv-printable-sheet .cv-entry-sub,
+  #cv-printable-sheet .cv-bullets,
+  #cv-printable-sheet .cv-skills-list {
+    font-size: 9.5pt !important;
+    line-height: 1.45 !important;
+  }
+}

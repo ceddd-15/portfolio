@@ -1,0 +1,185 @@
+/* ==========================================================================
+   ANIMATIONS — Kinetic Reveals, Specular Shimmers & Magnetic Transitions
+   ========================================================================== */
+
+/* Kinetic Hero Staggered Entrance */
+@keyframes kineticRise {
+  0% {
+    opacity: 0;
+    transform: translateY(22px) scale(0.985);
+    filter: blur(6px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+.kinetic-enter {
+  opacity: 0;
+  animation: kineticRise 0.78s var(--ease-expo) forwards;
+}
+
+.kinetic-delay-1 {
+  animation-delay: 60ms;
+}
+
+.kinetic-delay-2 {
+  animation-delay: 140ms;
+}
+
+.kinetic-delay-3 {
+  animation-delay: 240ms;
+}
+
+.kinetic-delay-4 {
+  animation-delay: 330ms;
+}
+
+.kinetic-delay-5 {
+  animation-delay: 420ms;
+}
+
+/* Iridescent Chrome Text Sheen */
+@keyframes chromeSheen {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.chrome-sheen-animate {
+  animation: chromeSheen 9s ease-in-out infinite;
+}
+
+/* Specular Border Shimmer on Hover */
+.specular-hover {
+  position: relative;
+}
+
+.specular-hover::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(
+    115deg,
+    transparent 20%,
+    rgba(233, 213, 255, 0.45) 48%,
+    rgba(168, 85, 247, 0.55) 56%,
+    transparent 80%
+  );
+  background-size: 220% 220%;
+  background-position: 0% 50%;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.35s ease, background-position 0.7s var(--ease-expo);
+}
+
+.specular-hover:hover::after {
+  opacity: 1;
+  background-position: 100% 50%;
+}
+
+/* Project Index Row Stagger Reveal */
+@keyframes rowFadeSlide {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.row-enter {
+  animation: rowFadeSlide 0.38s var(--ease-expo) both;
+}
+
+/* Magnetic Interactive Elements */
+.magnetic-btn {
+  transition:
+    transform 0.22s var(--ease-expo),
+    box-shadow 0.25s ease,
+    background-color 0.25s ease,
+    border-color 0.25s ease,
+    filter 0.25s ease;
+  will-change: transform;
+}
+
+/* Scroll Reveal Sections */
+.reveal-section {
+  opacity: 0;
+  transform: translateY(20px);
+  transition:
+    opacity var(--dur-slow) var(--ease-expo),
+    transform var(--dur-slow) var(--ease-expo);
+}
+
+.reveal-section.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Ambient Pulse for Status & Live Preview Indicators */
+@keyframes pulseGlow {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.55;
+    transform: scale(0.86);
+  }
+}
+
+.pulse-dot {
+  animation: pulseGlow 2.4s ease-in-out infinite;
+}
+
+/* Modal Entrance */
+@keyframes modalPop {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.modal-backdrop:not(.hidden) .modal-panel {
+  animation: modalPop 0.28s var(--ease-expo) both;
+}
+
+/* Reduced Motion Respect */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .kinetic-enter,
+  .chrome-sheen-animate,
+  .row-enter,
+  .pulse-dot,
+  .reveal-section {
+    animation: none !important;
+    transition: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+  }
+}
