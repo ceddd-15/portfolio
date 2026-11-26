@@ -312,16 +312,31 @@ function initSectionReveals() {
     return;
   }
 
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reduceMotion) {
+    sections.forEach((s) => s.classList.add('is-visible'));
+    return;
+  }
+
   const observer = new IntersectionObserver(
     (entries) => {
       entries.forEach((entry) => {
+        const el = entry.target;
         if (entry.isIntersecting) {
-          entry.target.classList.add('is-visible');
-          observer.unobserve(entry.target);
+          el.classList.remove('is-exiting');
+          el.classList.add('is-visible');
+        } else {
+          const exitDir = entry.boundingClientRect.top < 0 ? 'up' : 'down';
+          el.dataset.exit = exitDir;
+          el.classList.remove('is-visible');
+          el.classList.add('is-exiting');
         }
       });
     },
-    { threshold: 0.06 }
+    {
+      threshold: 0.01,
+      rootMargin: '-8% 0px -8% 0px'
+    }
   );
 
   sections.forEach((s) => observer.observe(s));
