@@ -60,9 +60,22 @@ export function renderFilterBar(activeCategory = 'All') {
     `;
   }).join('');
 
+  const optionsHtml = PROJECT_CATEGORIES.map((category) => {
+    const selected = category === activeCategory ? 'selected' : '';
+    return `<option value="${category}" ${selected}>${category} (${counts[category]})</option>`;
+  }).join('');
+
   filterBar.innerHTML = `
     <span id="filter-active-pill" class="filter-active-pill" aria-hidden="true"></span>
     ${tabsHtml}
+    <div class="filter-dropdown-wrap">
+      <select id="project-filter-select" class="filter-dropdown" aria-label="Filter Projects by Category">
+        ${optionsHtml}
+      </select>
+      <svg class="filter-dropdown-chevron" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
+      </svg>
+    </div>
   `;
 }
 

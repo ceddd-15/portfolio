@@ -817,21 +817,36 @@ export function initInteractions({ onOpenProject, onOpenCv, onCopyText }) {
     }
   }
 
-  // Category filter tab switching (event delegation)
+  // Category filter tab switching (event delegation) + portrait/mobile dropdown sync
   const filterBar = document.getElementById('project-filters');
   if (filterBar) {
+    function applyCategoryFilter(category) {
+      let activeTab = null;
+      filterBar.querySelectorAll('.filter-tab').forEach((t) => {
+        const match = t.getAttribute('data-category') === category;
+        t.setAttribute('aria-selected', match ? 'true' : 'false');
+        if (match) activeTab = t;
+      });
+      const selectEl = filterBar.querySelector('#project-filter-select');
+      if (selectEl && selectEl.value !== category) {
+        selectEl.value = category;
+      }
+
+      if (activeTab) positionFilterPill(activeTab);
+      renderProjects(category);
+      bindRowSpotlights();
+    }
+
     filterBar.addEventListener('click', (e) => {
       const tab = e.target.closest('.filter-tab');
       if (!tab) return;
+      applyCategoryFilter(tab.getAttribute('data-category'));
+    });
 
-      const category = tab.getAttribute('data-category');
-      filterBar.querySelectorAll('.filter-tab').forEach((t) => {
-        t.setAttribute('aria-selected', t === tab ? 'true' : 'false');
-      });
-
-      positionFilterPill(tab);
-      renderProjects(category);
-      bindRowSpotlights();
+    filterBar.addEventListener('change', (e) => {
+      const select = e.target.closest('#project-filter-select');
+      if (!select) return;
+      applyCategoryFilter(select.value);
     });
   }
 

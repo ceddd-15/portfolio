@@ -196,18 +196,20 @@ function startWebGLRenderer(canvas, prefersReducedMotion) {
 
   const mouse = { x: 0.35, y: 0.32, targetX: 0.35, targetY: 0.32 };
   const isCoarse = window.matchMedia('(pointer: coarse)').matches;
-  const minFrameMs = isCoarse ? 33 : 16;
+  const isPhoneSized = isCoarse && Math.min(window.innerWidth, window.innerHeight) < 600;
+  const minFrameMs = isPhoneSized ? 28 : 16;
   let rafId = null;
   let running = true;
   let lastDrawTime = 0;
   const startTime = performance.now();
 
   function resize() {
-    // Low-frequency liquid silk upscales cleanly via bilinear filtering; cap pixel budget aggressively
+    // Low-frequency liquid silk upscales cleanly via bilinear filtering; cap pixel budget per device tier
     const cssW = Math.max(1, window.innerWidth);
     const cssH = Math.max(1, window.innerHeight);
-    const maxPixels = isCoarse ? 0.34e6 : 0.65e6;
-    const dprCap = isCoarse ? 1.0 : 1.25;
+    const phoneNow = isCoarse && Math.min(cssW, cssH) < 600;
+    const maxPixels = phoneNow ? 0.36e6 : 0.72e6;
+    const dprCap = phoneNow ? 1.0 : 1.25;
     const scale = Math.min(dprCap, Math.sqrt(maxPixels / (cssW * cssH)));
     const width = Math.max(1, Math.floor(cssW * scale));
     const height = Math.max(1, Math.floor(cssH * scale));

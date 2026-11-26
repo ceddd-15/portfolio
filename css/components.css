@@ -200,10 +200,14 @@
 .nav-link {
   position: relative;
   z-index: 1;
-  padding: 0.4rem 0.9rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.42rem 0.9rem;
   border-radius: var(--radius-pill);
   font-size: 0.75rem;
   font-weight: 500;
+  line-height: 1;
   letter-spacing: 0.02em;
   color: var(--ink-secondary);
   transition: color var(--dur-fast) ease;
@@ -712,8 +716,67 @@
   width: 100%;
 }
 
-/* Tablet & phone: tidy 2x2 grid so every cell is filled (no dead space) */
-@media (max-width: 959px) {
+.filter-dropdown-wrap {
+  display: none;
+  position: relative;
+  width: 100%;
+}
+
+.filter-dropdown {
+  width: 100%;
+  appearance: none;
+  -webkit-appearance: none;
+  padding: 0.65rem 2.35rem 0.65rem 0.95rem;
+  border-radius: 0.75rem;
+  background: rgba(18, 12, 34, 0.92);
+  border: 1px solid rgba(216, 180, 254, 0.34);
+  color: var(--chrome-white);
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-weight: 500;
+  line-height: 1.3;
+  cursor: pointer;
+  outline: none;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14);
+}
+
+.filter-dropdown:focus-visible {
+  border-color: var(--violet-lavender);
+  box-shadow: 0 0 0 2px rgba(168, 85, 247, 0.35);
+}
+
+.filter-dropdown option {
+  background: #0d0a16;
+  color: var(--ink-primary);
+}
+
+.filter-dropdown-chevron {
+  position: absolute;
+  right: 0.85rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--violet-lavender);
+  pointer-events: none;
+}
+
+/* Tablet & phone: dropdown on phones or any portrait orientation */
+@media (max-width: 767px), (orientation: portrait) {
+  .filter-bar {
+    padding: 0.25rem;
+  }
+
+  .filter-tab,
+  .filter-active-pill {
+    display: none;
+  }
+
+  .filter-dropdown-wrap {
+    display: block;
+  }
+}
+
+/* Landscape tablets narrower than 960px: tidy 2x2 grid */
+@media (max-width: 959px) and (min-width: 768px) and (orientation: landscape) {
   .filter-bar {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -722,12 +785,6 @@
   .filter-tab {
     white-space: normal;
     line-height: 1.3;
-  }
-}
-
-@media (max-width: 520px) {
-  .filter-bar {
-    grid-template-columns: minmax(0, 1fr);
   }
 }
 
@@ -2934,9 +2991,38 @@
   }
 }
 
+@media (max-width: 1199px) {
+  .nav-shell {
+    max-width: var(--container-max);
+  }
+}
+
 @media (min-width: 640px) and (max-width: 1023px) {
   .hero-headline {
-    font-size: clamp(1.9rem, 4.9vw, 3.15rem);
+    font-size: clamp(1.75rem, 5vw, 3.15rem);
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+
+  .project-index-inner {
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+    gap: 0.85rem 1.25rem;
+    align-items: start;
+  }
+
+  .project-col-summary {
+    padding-left: 0;
+  }
+
+  .project-col-actions {
+    grid-column: 1 / -1;
+    padding-left: 2rem;
+  }
+
+  .timeline-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 2.25rem;
   }
 }
 
@@ -3219,14 +3305,17 @@
 
 @media (pointer: coarse) {
   .icon-pill-btn {
-    width: 2.6rem;
-    height: 2.6rem;
+    width: 2.4rem;
+    height: 2.4rem;
+  }
+
+  .nav-link {
+    min-height: 2.15rem;
   }
 
   .filter-tab,
-  .nav-link,
   .mobile-nav-link {
-    min-height: 2.6rem;
+    min-height: 2.5rem;
   }
 
   .mini-pill {
