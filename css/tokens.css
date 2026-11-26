@@ -53,7 +53,7 @@
   /* Layout & Spacing */
   --container-max: 72rem;
   --nav-max: 56rem;
-  --section-pad-y: clamp(4.25rem, 7vw, 6.25rem);
+  --section-pad-y: clamp(3rem, 8vw, 6.25rem);
   --gutter-x: clamp(1rem, 3.2vw, 2rem);
 
   /* Radii */

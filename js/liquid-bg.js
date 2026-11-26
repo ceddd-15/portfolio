@@ -200,9 +200,15 @@ function startWebGLRenderer(canvas, prefersReducedMotion) {
   const startTime = performance.now();
 
   function resize() {
-    const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
-    const width = Math.max(1, Math.floor(window.innerWidth * dpr));
-    const height = Math.max(1, Math.floor(window.innerHeight * dpr));
+    // Adaptive render scale: crisp on desktops, capped pixel budget on phones/tablets
+    const cssW = Math.max(1, window.innerWidth);
+    const cssH = Math.max(1, window.innerHeight);
+    const coarse = window.matchMedia('(pointer: coarse)').matches;
+    const maxPixels = coarse ? 0.9e6 : 2.2e6;
+    const dprCap = Math.min(window.devicePixelRatio || 1, 1.5);
+    const scale = Math.min(dprCap, Math.sqrt(maxPixels / (cssW * cssH)));
+    const width = Math.max(1, Math.floor(cssW * scale));
+    const height = Math.max(1, Math.floor(cssH * scale));
     if (canvas.width !== width || canvas.height !== height) {
       canvas.width = width;
       canvas.height = height;
@@ -214,6 +220,13 @@ function startWebGLRenderer(canvas, prefersReducedMotion) {
   function onPointerMove(e) {
     mouse.targetX = e.clientX / Math.max(window.innerWidth, 1);
     mouse.targetY = e.clientY / Math.max(window.innerHeight, 1);
+  }
+
+  function onTouch(e) {
+    if (e.touches && e.touches[0]) {
+      mouse.targetX = e.touches[0].clientX / Math.max(window.innerWidth, 1);
+      mouse.targetY = e.touches[0].clientY / Math.max(window.innerHeight, 1);
+    }
   }
 
   function renderFrame(now) {
@@ -234,6 +247,8 @@ function startWebGLRenderer(canvas, prefersReducedMotion) {
   resize();
   window.addEventListener('resize', resize, { passive: true });
   window.addEventListener('pointermove', onPointerMove, { passive: true });
+  window.addEventListener('touchstart', onTouch, { passive: true });
+  window.addEventListener('touchmove', onTouch, { passive: true });
 
   canvas.addEventListener('webglcontextlost', (e) => {
     e.preventDefault();

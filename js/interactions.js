@@ -38,7 +38,12 @@ export function positionFilterPill(activeTab) {
 }
 
 function initMagneticButtons() {
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  if (
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches ||
+    window.matchMedia('(hover: none)').matches
+  ) {
+    return;
+  }
 
   const magneticEls = document.querySelectorAll('[data-magnetic]');
   magneticEls.forEach((el) => {
@@ -56,7 +61,13 @@ function initMagneticButtons() {
 
 function initCursorAmbientGlow() {
   const glow = document.getElementById('cursor-ambient-glow');
-  if (!glow || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  if (
+    !glow ||
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches ||
+    window.matchMedia('(hover: none)').matches
+  ) {
+    return;
+  }
 
   let targetX = window.innerWidth * 0.5;
   let targetY = window.innerHeight * 0.35;
@@ -99,47 +110,111 @@ function initScrollMechanics() {
   const navPill = document.getElementById('nav-active-pill');
   const desktopNav = document.getElementById('desktop-nav');
   const navLinks = document.querySelectorAll('.nav-link');
+  const mobileLinks = document.querySelectorAll('.mobile-nav-link[data-nav-target]');
+  const navShell = document.querySelector('.obsidian-pill-nav');
   const sectionIds = ['projects', 'skills', 'notes', 'education'];
   const timelineContainer = document.getElementById('timeline-container');
   const eduRail = document.getElementById('education-scroll-rail');
+  const sculpture = document.getElementById('chrome-sculpture-container');
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  let activeId = null;
+  let locked = false;
+  let lockTimer = null;
+  let ticking = false;
+
+  // Layout-based offset (ignores reveal transforms so targets stay pixel-precise)
+  function absTop(el) {
+    let y = 0;
+    let n = el;
+    while (n) {
+      y += n.offsetTop;
+      n = n.offsetParent;
+    }
+    return y;
+  }
+
+  function anchorOf(id) {
+    const sec = document.getElementById(id);
+    return sec ? sec.querySelector('.section-glass-surface') || sec : null;
+  }
+
+  function navBottom() {
+    return navShell ? navShell.getBoundingClientRect().bottom : 72;
+  }
+
+  function scrollTargetY(id) {
+    const anchor = anchorOf(id);
+    if (!anchor) return null;
+    const docMax = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+    const y = absTop(anchor) - navBottom() - 18;
+    return Math.max(0, Math.min(docMax, Math.round(y)));
+  }
+
+  function placePill() {
+    if (!navPill || !desktopNav) return;
+    const link = activeId ? desktopNav.querySelector(`[data-nav-target="${activeId}"]`) : null;
+    const nRect = desktopNav.getBoundingClientRect();
+    if (!link || nRect.width === 0) {
+      navPill.style.opacity = '0';
+      return;
+    }
+    const lRect = link.getBoundingClientRect();
+    navPill.style.opacity = '1';
+    navPill.style.width = `${lRect.width}px`;
+    navPill.style.left = `${lRect.left - nRect.left}px`;
+  }
+
+  function setActive(id) {
+    activeId = id;
+    navLinks.forEach((l) => l.classList.toggle('is-active', l.dataset.navTarget === id));
+    mobileLinks.forEach((l) => l.classList.toggle('is-active', l.dataset.navTarget === id));
+    placePill();
+  }
+
+  function detectSection() {
+    const y = window.scrollY || document.documentElement.scrollTop;
+    const docMax = document.documentElement.scrollHeight - window.innerHeight;
+    if (docMax > 0 && y >= docMax - 6) return sectionIds[sectionIds.length - 1];
+    const line = y + navBottom() + window.innerHeight * 0.28;
+    let current = null;
+    sectionIds.forEach((id) => {
+      const a = anchorOf(id);
+      if (a && absTop(a) <= line) current = id;
+    });
+    return current;
+  }
+
+  function releaseLock() {
+    locked = false;
+    clearTimeout(lockTimer);
+    lockTimer = null;
+    updateScrollUI();
+  }
+
+  function lockTo(id) {
+    locked = true;
+    clearTimeout(lockTimer);
+    lockTimer = setTimeout(releaseLock, 900);
+    setActive(id);
+  }
 
   function updateScrollUI() {
-    const scrollTop = window.scrollY || document.documentElement.scrollTop;
+    const y = window.scrollY || document.documentElement.scrollTop;
     const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-    const pct = docHeight > 0 ? Math.min(100, Math.max(0, (scrollTop / docHeight) * 100)) : 0;
+    const pct = docHeight > 0 ? Math.min(100, Math.max(0, (y / docHeight) * 100)) : 0;
 
-    if (progressBar) {
-      progressBar.style.width = `${pct.toFixed(2)}%`;
+    if (progressBar) progressBar.style.width = `${pct.toFixed(2)}%`;
+
+    if (!locked) {
+      const found = detectSection();
+      if (found !== activeId) setActive(found);
     }
 
-    // Active section detection for floating pill navbar
-    let currentSection = null;
-    const triggerLine = scrollTop + window.innerHeight * 0.35;
-    sectionIds.forEach((id) => {
-      const sec = document.getElementById(id);
-      if (sec && sec.offsetTop <= triggerLine) {
-        currentSection = id;
-      }
-    });
-
-    if (navPill && desktopNav) {
-      if (!currentSection) {
-        navPill.style.opacity = '0';
-        navLinks.forEach((link) => link.classList.remove('is-active'));
-      } else {
-        const activeLink = desktopNav.querySelector(`[data-nav-target="${currentSection}"]`);
-        if (activeLink) {
-          const nRect = desktopNav.getBoundingClientRect();
-          const lRect = activeLink.getBoundingClientRect();
-          navPill.style.opacity = '1';
-          navPill.style.width = `${lRect.width}px`;
-          navPill.style.left = `${lRect.left - nRect.left}px`;
-          navLinks.forEach((link) => link.classList.toggle('is-active', link === activeLink));
-        }
-      }
+    if (sculpture && !reduceMotion) {
+      sculpture.style.setProperty('--pan-y', `${(-Math.min(y, 700) * 0.06).toFixed(1)}px`);
     }
 
-    // Vertical violet-chrome timeline rail progress
     if (timelineContainer && eduRail) {
       const tRect = timelineContainer.getBoundingClientRect();
       const start = window.innerHeight * 0.84;
@@ -152,12 +227,80 @@ function initScrollMechanics() {
     }
   }
 
-  window.addEventListener('scroll', updateScrollUI, { passive: true });
+  window.addEventListener(
+    'scroll',
+    () => {
+      if (locked) {
+        clearTimeout(lockTimer);
+        lockTimer = setTimeout(releaseLock, 160);
+      }
+      if (!ticking) {
+        ticking = true;
+        requestAnimationFrame(() => {
+          ticking = false;
+          updateScrollUI();
+        });
+      }
+    },
+    { passive: true }
+  );
+
+  // User-driven scrolling always cancels a click-lock immediately
+  ['wheel', 'touchstart', 'keydown'].forEach((evt) => {
+    window.addEventListener(
+      evt,
+      () => {
+        if (locked) {
+          locked = false;
+          clearTimeout(lockTimer);
+        }
+      },
+      { passive: true }
+    );
+  });
+
+  // Precise anchor navigation: section card lands just below the floating navbar
+  document.addEventListener('click', (e) => {
+    const link = e.target.closest('a[href^="#"]');
+    if (!link) return;
+    const id = link.getAttribute('href').slice(1);
+    if (id !== 'top' && !sectionIds.includes(id)) return;
+
+    e.preventDefault();
+    const y = id === 'top' ? 0 : scrollTargetY(id);
+    if (y === null) return;
+    lockTo(id === 'top' ? null : id);
+    window.scrollTo({ top: y, behavior: reduceMotion ? 'auto' : 'smooth' });
+    if (window.history && window.history.replaceState) {
+      window.history.replaceState(null, '', id === 'top' ? window.location.pathname + window.location.search : `#${id}`);
+    }
+  });
+
   window.addEventListener('resize', () => {
+    placePill();
     updateScrollUI();
     const activeFilter = document.querySelector('.filter-tab[aria-selected="true"]');
     if (activeFilter) positionFilterPill(activeFilter);
   });
+
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(() => {
+      placePill();
+      const activeFilter = document.querySelector('.filter-tab[aria-selected="true"]');
+      if (activeFilter) positionFilterPill(activeFilter);
+    });
+  }
+
+  // Deep-link on load (e.g. /#education) lands precisely as well
+  const initialHash = window.location.hash.slice(1);
+  if (sectionIds.includes(initialHash)) {
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        const y = scrollTargetY(initialHash);
+        if (y !== null) window.scrollTo({ top: y, behavior: 'auto' });
+      }, 250);
+    });
+  }
 
   updateScrollUI();
 }

@@ -104,10 +104,10 @@
 
       <!-- Mobile Dropdown Menu -->
       <nav id="mobile-menu" aria-label="Mobile Navigation" class="mobile-menu-panel hidden">
-        <a href="#projects" class="mobile-nav-link">Projects</a>
-        <a href="#skills" class="mobile-nav-link">Skills</a>
-        <a href="#notes" class="mobile-nav-link">Notes</a>
-        <a href="#education" class="mobile-nav-link">Education</a>
+        <a href="#projects" data-nav-target="projects" class="mobile-nav-link">Projects</a>
+        <a href="#skills" data-nav-target="skills" class="mobile-nav-link">Skills</a>
+        <a href="#notes" data-nav-target="notes" class="mobile-nav-link">Notes</a>
+        <a href="#education" data-nav-target="education" class="mobile-nav-link">Education</a>
       </nav>
     </div>
   </header>
@@ -120,14 +120,14 @@
       <div class="container">
         <div class="hero-grid">
           <div class="hero-copy">
-            <div class="hero-eyebrow kinetic-enter kinetic-delay-1">
+            <div class="hero-eyebrow kinetic-slide-left">
               <span class="status-dot pulse-dot" aria-hidden="true"></span>
               <span>BS Computer Science &middot; CIIT &middot; Antipolo, PH</span>
             </div>
 
-            <h1 class="hero-headline kinetic-enter kinetic-delay-2">
-              <span class="chrome-metallic-text chrome-sheen-animate">JOSH CEDRICK</span>
-              <span class="chrome-violet-text chrome-sheen-animate">M. CORPUZ</span>
+            <h1 class="hero-headline">
+              <span class="chrome-metallic-text chrome-sheen-animate wipe-line wipe-line-1">JOSH CEDRICK</span>
+              <span class="chrome-violet-text chrome-sheen-animate wipe-line wipe-line-2">M. CORPUZ</span>
             </h1>
 
             <p class="hero-summary kinetic-enter kinetic-delay-3">
@@ -150,7 +150,7 @@
             </div>
 
             <!-- Open Horizontal Hairline Metric Strip -->
-            <div class="hero-metrics kinetic-enter kinetic-delay-5">
+            <div class="hero-metrics kinetic-wipe">
               <div class="metric-cell">
                 <div id="hero-project-count" class="metric-value">10</div>
                 <div class="metric-label">Projects</div>
@@ -167,7 +167,7 @@
           </div>
 
           <!-- Right Side: Interactive Liquid Purple-Chrome Metaball/Ribbon Sculpture -->
-          <div class="hero-sculpture-col kinetic-enter kinetic-delay-3">
+          <div class="hero-sculpture-col kinetic-slide-right">
             <div
               id="chrome-sculpture-container"
               class="chrome-sculpture-container"
@@ -186,7 +186,7 @@
     <!-- =====================================================================
          SECTION 01: PROJECTS & REPOSITORIES (OPEN 1PX HAIRLINE INDEX 01–10)
          ===================================================================== -->
-    <section id="projects" class="section-block reveal-section">
+    <section id="projects" class="section-block reveal-section" data-reveal="left">
       <div class="container">
         <div class="section-glass-surface">
           <div class="projects-header">
@@ -216,7 +216,7 @@
     <!-- =====================================================================
          SECTION 02: TECHNICAL SKILLS LEDGER (EXACT CV PROFICIENCY TIERS)
          ===================================================================== -->
-    <section id="skills" class="section-block reveal-section">
+    <section id="skills" class="section-block reveal-section" data-reveal="right">
       <div class="container">
         <div class="section-glass-surface">
           <div class="section-header-split">
@@ -254,7 +254,7 @@
     <!-- =====================================================================
          SECTION 03: ENGINEERING BUILD NOTES ACCORDION (VERBATIM)
          ===================================================================== -->
-    <section id="notes" class="section-block reveal-section">
+    <section id="notes" class="section-block reveal-section" data-reveal="left">
       <div class="container">
         <div class="section-glass-surface">
           <div class="section-heading-group">
@@ -274,7 +274,7 @@
     <!-- =====================================================================
          SECTION 04: EDUCATION & EXPERIENCE TIMELINE (SCROLL-ANIMATED RAIL)
          ===================================================================== -->
-    <section id="education" class="section-block reveal-section">
+    <section id="education" class="section-block reveal-section" data-reveal="right">
       <div class="container">
         <div class="section-glass-surface">
           <div class="section-heading-group">

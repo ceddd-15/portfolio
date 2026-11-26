@@ -92,19 +92,24 @@
 }
 
 /* Project Index Row Stagger Reveal */
-@keyframes rowFadeSlide {
+@keyframes rowWipeSlide {
   from {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translate3d(-28px, 0, 0);
+    clip-path: inset(0 100% 0 0);
+  }
+  55% {
+    opacity: 1;
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: translate3d(0, 0, 0);
+    clip-path: inset(0 0 0 0);
   }
 }
 
 .row-enter {
-  animation: rowFadeSlide 0.38s var(--ease-expo) both;
+  animation: rowWipeSlide 0.62s var(--ease-expo) both;
 }
 
 /* Magnetic Interactive Elements */
@@ -118,18 +123,273 @@
   will-change: transform;
 }
 
-/* Scroll Reveal Sections */
+/* Scroll Reveal Sections: fade + directional slide, staggered children, color wipe */
 .reveal-section {
   opacity: 0;
-  transform: translateY(20px);
+  transform: translate3d(0, 24px, 0);
   transition:
-    opacity var(--dur-slow) var(--ease-expo),
-    transform var(--dur-slow) var(--ease-expo);
+    opacity 0.8s var(--ease-expo),
+    transform 0.8s var(--ease-expo);
 }
 
 .reveal-section.is-visible {
   opacity: 1;
-  transform: translateY(0);
+  transform: translate3d(0, 0, 0);
+}
+
+.reveal-section[data-reveal='left'] {
+  --reveal-x: -64px;
+}
+
+.reveal-section[data-reveal='right'] {
+  --reveal-x: 64px;
+}
+
+@keyframes surfaceSlide {
+  from {
+    opacity: 0;
+    transform: translate3d(var(--reveal-x, 0px), 28px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translate3d(-48px, 0, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translate3d(72px, 0, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 22px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes wipeRight {
+  from {
+    opacity: 0.2;
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    opacity: 1;
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+@keyframes lineWipe {
+  from {
+    clip-path: inset(0 100% 0 0);
+    transform: translate3d(-28px, 0, 0);
+  }
+  to {
+    clip-path: inset(0 -2% 0 0);
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes navDrop {
+  from {
+    opacity: 0;
+    transform: translate3d(0, -80px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+/* Hero entrance: slide, fade and color-wipe */
+.kinetic-slide-left {
+  animation: slideInLeft 0.9s var(--ease-expo) 0.06s both;
+}
+
+.kinetic-slide-right {
+  animation: slideInRight 1.15s var(--ease-expo) 0.3s both;
+}
+
+.kinetic-wipe {
+  animation: wipeRight 1s cubic-bezier(0.7, 0, 0.2, 1) 0.6s both;
+}
+
+.hero-headline .wipe-line {
+  animation:
+    lineWipe 1s cubic-bezier(0.7, 0, 0.2, 1) both,
+    chromeSheen 9s ease-in-out 1.4s infinite;
+}
+
+.hero-headline .wipe-line-1 {
+  animation-delay: 0.12s, 1.4s;
+}
+
+.hero-headline .wipe-line-2 {
+  animation-delay: 0.34s, 1.4s;
+}
+
+.nav-shell {
+  animation: navDrop 0.9s var(--ease-expo) both;
+}
+
+/* Section content: directional glass slide + staggered children */
+.reveal-section.is-visible .section-glass-surface {
+  animation: surfaceSlide 1s var(--ease-expo) both;
+}
+
+.reveal-section.is-visible .eyebrow {
+  animation: slideInLeft 0.8s var(--ease-expo) 0.25s both;
+}
+
+.reveal-section.is-visible .section-subtitle,
+.reveal-section.is-visible .header-hint {
+  animation: fadeUp 0.8s var(--ease-expo) 0.4s both;
+}
+
+.reveal-section.is-visible .filter-bar {
+  animation: wipeRight 0.95s cubic-bezier(0.7, 0, 0.2, 1) 0.4s both;
+}
+
+.reveal-section.is-visible .index-list-meta {
+  animation: fadeUp 0.7s var(--ease-expo) 0.55s both;
+}
+
+.reveal-section.is-visible .skill-column,
+.reveal-section.is-visible .timeline-grid > .timeline-col {
+  animation: fadeUp 0.85s var(--ease-expo) both;
+  animation-delay: calc(0.4s + var(--i, 0) * 0.14s);
+}
+
+.reveal-section.is-visible .note-item {
+  animation: slideInLeft 0.85s var(--ease-expo) both;
+  animation-delay: calc(0.4s + var(--i, 0) * 0.14s);
+}
+
+.skills-grid > :nth-child(2),
+.timeline-grid > :nth-child(2),
+.notes-list > :nth-child(2) {
+  --i: 1;
+}
+
+.skills-grid > :nth-child(3),
+.notes-list > :nth-child(3) {
+  --i: 2;
+}
+
+/* Color wipe over section titles */
+.reveal-section .section-title {
+  position: relative;
+  display: inline-block;
+  overflow: hidden;
+  padding-bottom: 0.1em;
+  padding-right: 0.12em;
+  opacity: 0;
+}
+
+.reveal-section .section-title::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(100deg, var(--violet-mid), var(--violet-vivid) 55%, var(--violet-specular));
+  transform: translateX(-102%);
+  pointer-events: none;
+}
+
+.reveal-section.is-visible .section-title {
+  animation: titleReveal 1s var(--ease-expo) 0.2s forwards;
+}
+
+.reveal-section.is-visible .section-title::after {
+  animation: titleWipe 1s cubic-bezier(0.7, 0, 0.2, 1) 0.2s forwards;
+}
+
+@keyframes titleReveal {
+  0%,
+  45% {
+    opacity: 0;
+  }
+  46%,
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes titleWipe {
+  0% {
+    transform: translateX(-102%);
+  }
+  50% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(102%);
+  }
+}
+
+/* Panning specular sheen sweeping across each glass surface once on reveal */
+.section-glass-surface::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  background: linear-gradient(105deg, transparent 38%, rgba(233, 213, 255, 0.11) 50%, transparent 62%);
+  background-size: 260% 100%;
+  background-position: 130% 0;
+}
+
+.reveal-section.is-visible .section-glass-surface::before {
+  animation: sheenPan 1.9s ease-out 0.5s 1 both;
+}
+
+@keyframes sheenPan {
+  0% {
+    opacity: 1;
+    background-position: 130% 0;
+  }
+  100% {
+    opacity: 0;
+    background-position: -30% 0;
+  }
+}
+
+/* Tab pane switching inside the project modal */
+@keyframes paneSlide {
+  from {
+    opacity: 0;
+    transform: translate3d(28px, 0, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+#inspect-overview-pane:not(.hidden),
+#inspect-preview-pane:not(.hidden) {
+  animation: paneSlide 0.45s var(--ease-expo) both;
 }
 
 /* Ambient Pulse for Status & Live Preview Indicators */
@@ -149,20 +409,58 @@
   animation: pulseGlow 2.4s ease-in-out infinite;
 }
 
-/* Modal Entrance */
+/* Modal Entrance: backdrop fade + panel slide (bottom sheet on phones) */
 @keyframes modalPop {
   from {
     opacity: 0;
-    transform: translateY(12px) scale(0.98);
+    transform: translate3d(0, 36px, 0) scale(0.97);
   }
   to {
     opacity: 1;
-    transform: translateY(0) scale(1);
+    transform: translate3d(0, 0, 0) scale(1);
   }
 }
 
+@keyframes modalSheet {
+  from {
+    opacity: 0.4;
+    transform: translate3d(0, 100%, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes backdropFade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.modal-backdrop:not(.hidden) {
+  animation: backdropFade 0.3s ease both;
+}
+
 .modal-backdrop:not(.hidden) .modal-panel {
-  animation: modalPop 0.28s var(--ease-expo) both;
+  animation: modalPop 0.5s var(--ease-expo) both;
+}
+
+@media (max-width: 639px) {
+  .modal-backdrop:not(.hidden) .modal-panel {
+    animation-name: modalSheet;
+  }
+
+  .reveal-section[data-reveal='left'] {
+    --reveal-x: -26px;
+  }
+
+  .reveal-section[data-reveal='right'] {
+    --reveal-x: 26px;
+  }
 }
 
 /* Reduced Motion Respect */
@@ -171,15 +469,22 @@
     scroll-behavior: auto;
   }
 
-  .kinetic-enter,
-  .chrome-sheen-animate,
-  .row-enter,
-  .pulse-dot,
-  .reveal-section {
+  *,
+  *::before,
+  *::after {
     animation: none !important;
-    transition: none !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .kinetic-enter,
+  .reveal-section,
+  .reveal-section .section-title {
     opacity: 1 !important;
     transform: none !important;
     filter: none !important;
+  }
+
+  .reveal-section .section-title::after {
+    display: none;
   }
 }

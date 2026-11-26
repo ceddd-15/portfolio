@@ -548,7 +548,7 @@
       padding: 14px 20px;
       border: 1px solid var(--border-color);
       display: grid;
-      grid-template-columns: 120px 1fr 110px 125px 105px 46px;
+      grid-template-columns: 36px 1fr 110px 125px 105px 46px;
       align-items: center;
       font-size: 0.82rem;
       font-weight: 700;
@@ -624,16 +624,85 @@
       font-size: 0.88rem;
     }
 
-    @media (max-width: 768px) {
-      .header-main { gap: 10px; padding: 10px 14px; }
-      .logo-text { display: none; }
-      .shop-page { flex-direction: column; }
+    @media (max-width: 960px) {
+      .shop-page { flex-direction: column; gap: 16px; padding: 20px 16px; }
       .shop-sidebar { width: 100%; }
-      .product-detail-page { grid-template-columns: 1fr; }
+      .category-card { padding: 12px; }
+      .category-title { display: none; }
+      .category-list {
+        display: flex;
+        gap: 6px;
+        overflow-x: auto;
+        scrollbar-width: none;
+        padding-bottom: 2px;
+      }
+      .category-list::-webkit-scrollbar { display: none; }
+      .category-link { white-space: nowrap; margin-bottom: 0; flex-shrink: 0; }
+      .product-detail-page { grid-template-columns: 1fr; padding: 20px 16px; gap: 18px; }
       .footer-content { grid-template-columns: 1fr 1fr; }
+      .cart-page { padding: 20px 16px; }
+    }
+
+    @media (max-width: 760px) {
+      .header-main { flex-wrap: wrap; gap: 10px 12px; padding: 10px 14px; }
+      .logo { order: 1; font-size: 1.25rem; }
+      .logo-icon { width: 34px; height: 34px; }
+      .header-actions { order: 2; margin-left: auto; gap: 2px; }
+      .header-action { padding: 8px; }
+      .header-action span:not(.cart-badge) { display: none; }
+      .search-box { order: 3; flex: 1 1 100%; max-width: none; }
+      .header-nav { padding: 0 12px; }
+      .header-nav-inner { scrollbar-width: none; }
+      .header-nav-inner::-webkit-scrollbar { display: none; }
+      .hero-section { padding: 44px 16px; }
+      .section { padding: 32px 0; }
+      .container { padding: 0 16px; }
+      .categories-section, .features-section { padding: 36px 0; }
+      .shop-toolbar { padding: 12px 14px; }
+      .sort-options { overflow-x: auto; flex-wrap: nowrap; scrollbar-width: none; width: 100%; }
+      .sort-options::-webkit-scrollbar { display: none; }
+      .sort-btn { white-space: nowrap; flex-shrink: 0; }
       .cart-header { display: none; }
-      .cart-item { grid-template-columns: 1fr; }
-      .cart-summary { flex-direction: column; align-items: stretch; }
+      .cart-item {
+        grid-template-columns: 28px minmax(0, 1fr) auto;
+        grid-template-areas:
+          "chk prod rm"
+          ".   price total"
+          ".   qty   qty";
+        gap: 8px 10px;
+        padding: 14px;
+      }
+      .cart-item-select { grid-area: chk; }
+      .cart-item-product { grid-area: prod; }
+      .cart-item-price { grid-area: price; text-align: left; }
+      .cart-item-quantity { grid-area: qty; justify-content: flex-start; }
+      .cart-item-total { grid-area: total; }
+      .remove-btn { grid-area: rm; justify-self: end; }
+      .cart-summary { flex-direction: column; align-items: stretch; padding: 18px; }
+      .cart-summary-row { gap: 20px; }
+      .cart-summary > div:last-child { align-items: stretch !important; }
+      .checkout-btn { width: 100%; padding: 13px 20px; }
+      .detail-title { font-size: 1.35rem; }
+      .detail-price { font-size: 1.5rem; }
+      .product-detail-card { padding: 18px; }
+      .product-gallery { padding: 12px; }
+    }
+
+    @media (max-width: 560px) {
+      .products-grid { grid-template-columns: repeat(auto-fill, minmax(145px, 1fr)); gap: 12px; }
+      .product-info { padding: 11px; }
+      .product-name { font-size: 0.85rem; }
+      .product-price { font-size: 1rem; }
+      .categories-grid { grid-template-columns: repeat(auto-fill, minmax(105px, 1fr)); gap: 10px; }
+      .hero-actions { flex-direction: column; align-items: stretch; }
+      .footer-content { grid-template-columns: 1fr; gap: 22px; }
+      .detail-actions > * { flex: 1 1 100%; }
+      .logo-text { display: none; }
+    }
+
+    @media (max-width: 360px) {
+      .products-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+      .cart-item { padding: 12px 10px; }
     }
   </style>
 </head>
@@ -1233,11 +1302,10 @@
       return `
         <div class="cart-page">
           <div class="cart-header">
-            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;grid-column:1 / 3;">
               <input type="checkbox" id="cart-select-all" ${allSelected ? "checked" : ""} />
               <span>Select All</span>
             </label>
-            <span>Product</span>
             <span style="text-align:center;">Unit Price</span>
             <span style="text-align:center;">Quantity</span>
             <span style="text-align:right;">Total</span>
@@ -1249,7 +1317,7 @@
               .map(
                 (item) => `
                   <div class="cart-item">
-                    <input type="checkbox" data-cart-toggle="${item.productId}" ${item.selected ? "checked" : ""} />
+                    <input type="checkbox" class="cart-item-select" data-cart-toggle="${item.productId}" ${item.selected ? "checked" : ""} />
                     <div class="cart-item-product">
                       <img src="${item.product.image}" alt="${item.product.name}" class="cart-item-image" onerror="this.onerror=null;this.src=FALLBACK_PRODUCT_SVG;" />
                       <div>
