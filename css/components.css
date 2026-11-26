@@ -281,6 +281,7 @@
 .hero-section {
   padding-top: clamp(3.5rem, 8vw, 6.25rem);
   padding-bottom: clamp(4rem, 8vw, 6.5rem);
+  overflow: visible;
 }
 
 .hero-grid {
@@ -288,6 +289,7 @@
   grid-template-columns: 1fr;
   gap: 2.5rem;
   align-items: center;
+  overflow: visible;
 }
 
 @media (min-width: 1024px) {
@@ -401,6 +403,7 @@
 /* Interactive Liquid Purple-Chrome Ribbon Sculpture Canvas */
 .hero-sculpture-col {
   width: 100%;
+  overflow: visible;
 }
 
 .chrome-sculpture-container {
@@ -409,6 +412,7 @@
   height: 330px;
   cursor: crosshair;
   user-select: none;
+  overflow: visible;
 }
 
 @media (min-width: 640px) {
@@ -424,9 +428,12 @@
 }
 
 .chrome-sculpture-canvas {
+  position: absolute;
+  inset: -88px;
   display: block;
-  width: 100%;
-  height: 100%;
+  width: calc(100% + 176px);
+  height: calc(100% + 176px);
+  pointer-events: none;
 }
 
 .chrome-sculpture-hint {
@@ -2423,9 +2430,66 @@
   color: #e9d5ff;
   white-space: pre-wrap;
   word-break: break-word;
-  height: 16.5rem;
+  height: 17.5rem;
   overflow-y: auto;
   padding-right: 0.35rem;
+}
+
+.cli-line {
+  display: inline;
+}
+
+.cli-style-title {
+  color: #ffffff;
+  font-weight: 700;
+}
+
+.cli-style-room {
+  color: #67e8f9;
+  font-weight: 700;
+}
+
+.cli-style-highlight {
+  color: #e9d5ff;
+  font-weight: 600;
+}
+
+.cli-style-muted {
+  color: #9e93b8;
+}
+
+.cli-style-good {
+  color: #4ade80;
+}
+
+.cli-style-bad,
+.cli-style-danger {
+  color: #fb7185;
+  font-weight: 600;
+}
+
+.cli-style-dialogue {
+  color: #fcd34d;
+}
+
+.cli-style-item {
+  color: #c084fc;
+  font-weight: 600;
+}
+
+.cli-exited-banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.65rem 0.85rem;
+  border-radius: 0.6rem;
+  background: rgba(147, 51, 234, 0.14);
+  border: 1px solid rgba(216, 180, 254, 0.38);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--violet-specular);
 }
 
 .cli-keypad {

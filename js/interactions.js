@@ -275,8 +275,10 @@ function initLiquidChromeSculpture() {
   if (!ctx) return;
 
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  let width = 0;
-  let height = 0;
+  let containerWidth = 0;
+  let containerHeight = 0;
+  let canvasWidth = 0;
+  let canvasHeight = 0;
   let dpr = Math.min(window.devicePixelRatio || 1, 2);
 
   const pointer = {
@@ -292,12 +294,15 @@ function initLiquidChromeSculpture() {
   const ripples = [];
 
   function resizeCanvas() {
-    const rect = container.getBoundingClientRect();
-    width = Math.max(1, rect.width);
-    height = Math.max(1, rect.height);
+    const containerRect = container.getBoundingClientRect();
+    const canvasRect = canvas.getBoundingClientRect();
+    containerWidth = Math.max(1, containerRect.width);
+    containerHeight = Math.max(1, containerRect.height);
+    canvasWidth = Math.max(1, canvasRect.width);
+    canvasHeight = Math.max(1, canvasRect.height);
     dpr = Math.min(window.devicePixelRatio || 1, 2);
-    canvas.width = Math.floor(width * dpr);
-    canvas.height = Math.floor(height * dpr);
+    canvas.width = Math.floor(canvasWidth * dpr);
+    canvas.height = Math.floor(canvasHeight * dpr);
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   }
 
@@ -319,12 +324,12 @@ function initLiquidChromeSculpture() {
   }
 
   function spawnShockwave(clientX, clientY) {
-    const rect = container.getBoundingClientRect();
+    const canvasRect = canvas.getBoundingClientRect();
     ripples.push({
-      x: clientX - rect.left,
-      y: clientY - rect.top,
+      x: clientX - canvasRect.left,
+      y: clientY - canvasRect.top,
       radius: 10,
-      maxRadius: Math.max(width, height) * 0.72,
+      maxRadius: Math.min(canvasWidth, canvasHeight) * 0.44,
       alpha: 0.95,
     });
     pointer.velocity = Math.min(1.8, pointer.velocity + 0.95);
@@ -370,25 +375,26 @@ function initLiquidChromeSculpture() {
     pointer.y += (pointer.targetY - pointer.y) * 0.075;
     pointer.velocity *= 0.93;
 
-    ctx.clearRect(0, 0, width, height);
+    ctx.clearRect(0, 0, canvasWidth, canvasHeight);
 
-    const cx = width * 0.52 + pointer.x * 16;
-    const cy = height * 0.5 + pointer.y * 16;
-    const scale = Math.min(width, height) * 0.34;
+    const cx = canvasWidth * 0.5 + pointer.x * 14;
+    const cy = canvasHeight * 0.5 + pointer.y * 14;
+    const scale = Math.min(containerWidth, containerHeight) * 0.29;
+    const maxBloomR = Math.min(canvasWidth, canvasHeight) * 0.46;
 
     const bloom = ctx.createRadialGradient(
-      cx + pointer.x * 38,
-      cy + pointer.y * 38,
+      cx + pointer.x * 32,
+      cy + pointer.y * 32,
       scale * 0.06,
       cx,
       cy,
-      scale * (1.48 + pointer.velocity * 0.16)
+      Math.min(maxBloomR, scale * (1.42 + pointer.velocity * 0.14))
     );
     bloom.addColorStop(0, `rgba(192, 132, 252, ${0.26 + pointer.velocity * 0.14})`);
     bloom.addColorStop(0.45, 'rgba(126, 34, 206, 0.18)');
     bloom.addColorStop(1, 'rgba(5, 5, 7, 0)');
     ctx.fillStyle = bloom;
-    ctx.fillRect(0, 0, width, height);
+    ctx.fillRect(0, 0, canvasWidth, canvasHeight);
 
     let rippleDeform = 0;
     for (let r = ripples.length - 1; r >= 0; r--) {

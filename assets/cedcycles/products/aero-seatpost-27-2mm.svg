@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f8fafc"/>
+      <stop offset="100%" stop-color="#e2e8f0"/>
+    </linearGradient>
+    <linearGradient id="carbon" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#334155"/>
+      <stop offset="50%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#1e293b"/>
+    </linearGradient>
+  </defs>
+  <rect width="600" height="600" fill="url(#bg)"/>
+  <g transform="translate(20, 10)">
+    <path d="M185 162 C215 142, 325 144, 378 158 C395 163, 392 178, 372 182 C315 190, 218 190, 180 180 C166 176, 168 168, 185 162 Z" fill="url(#carbon)"/>
+    <rect x="260" y="182" width="44" height="24" rx="6" fill="#475569"/>
+    <path d="M268 206 L300 206 L278 470 L248 470 Z" fill="url(#carbon)"/>
+    <line x1="274" y1="230" x2="258" y2="450" stroke="#64748b" stroke-width="2" stroke-dasharray="6 8" opacity="0.55"/>
+    <text x="275" y="340" transform="rotate(-85 275 340)" text-anchor="middle" font-family="sans-serif" font-weight="800" font-size="14" letter-spacing="4" fill="#94a3b8">WEAPON</text>
+  </g>
+</svg>
