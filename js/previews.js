@@ -84,9 +84,16 @@ function mountCedCyclesWebsite(container) {
         </div>
 
         <div class="web-browser-controls">
-          <button type="button" class="mini-pill is-active" data-cc-route="landing">Home</button>
-          <button type="button" class="mini-pill" data-cc-route="shop">Shop</button>
-          <button type="button" class="mini-pill" data-cc-route="cart">Cart</button>
+          <div class="web-route-group">
+            <button type="button" class="mini-pill is-active" data-cc-route="landing">Home</button>
+            <button type="button" class="mini-pill" data-cc-route="shop">Shop</button>
+            <button type="button" class="mini-pill" data-cc-route="cart">Cart</button>
+          </div>
+          <div class="web-viewport-switcher" role="group" aria-label="Preview Viewport Size">
+            <button type="button" class="mini-pill is-active" data-cc-viewport="desktop" title="Desktop Width">Desktop</button>
+            <button type="button" class="mini-pill" data-cc-viewport="tablet" title="Tablet Width (768px)">Tablet</button>
+            <button type="button" class="mini-pill" data-cc-viewport="mobile" title="Mobile Width (390px)">Mobile</button>
+          </div>
           <a
             href="previews/cedcycles.html"
             target="_blank"
@@ -99,7 +106,7 @@ function mountCedCyclesWebsite(container) {
         </div>
       </div>
 
-      <div class="web-preview-frame-wrap">
+      <div id="cedcycles-frame-wrap" class="web-preview-frame-wrap" data-viewport="desktop">
         <iframe
           id="cedcycles-live-iframe"
           src="previews/cedcycles.html"
@@ -111,8 +118,18 @@ function mountCedCyclesWebsite(container) {
   `;
 
   const iframe = container.querySelector('#cedcycles-live-iframe');
+  const frameWrap = container.querySelector('#cedcycles-frame-wrap');
   const urlPill = container.querySelector('#cedcycles-url-pill');
   const routeBtns = container.querySelectorAll('[data-cc-route]');
+  const viewportBtns = container.querySelectorAll('[data-cc-viewport]');
+
+  viewportBtns.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const mode = btn.getAttribute('data-cc-viewport') || 'desktop';
+      viewportBtns.forEach((b) => b.classList.toggle('is-active', b === btn));
+      if (frameWrap) frameWrap.setAttribute('data-viewport', mode);
+    });
+  });
 
   routeBtns.forEach((btn) => {
     btn.addEventListener('click', () => {
