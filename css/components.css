@@ -759,35 +759,6 @@
   pointer-events: none;
 }
 
-/* Tablet & phone: dropdown on phones or any portrait orientation */
-@media (max-width: 767px), (orientation: portrait) {
-  .filter-bar {
-    padding: 0.25rem;
-  }
-
-  .filter-tab,
-  .filter-active-pill {
-    display: none;
-  }
-
-  .filter-dropdown-wrap {
-    display: block;
-  }
-}
-
-/* Landscape tablets narrower than 960px: tidy 2x2 grid */
-@media (max-width: 959px) and (min-width: 768px) and (orientation: landscape) {
-  .filter-bar {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .filter-tab {
-    white-space: normal;
-    line-height: 1.3;
-  }
-}
-
 .filter-active-pill {
   position: absolute;
   border-radius: 0.72rem;
@@ -830,6 +801,35 @@
 .filter-tab[aria-selected='true'] .filter-count {
   color: var(--violet-specular);
   opacity: 1;
+}
+
+/* Tablet & phone: dropdown on phones or any portrait orientation */
+@media (max-width: 767px), (orientation: portrait) {
+  .filter-bar {
+    padding: 0.25rem;
+  }
+
+  .filter-tab,
+  .filter-active-pill {
+    display: none;
+  }
+
+  .filter-dropdown-wrap {
+    display: block;
+  }
+}
+
+/* Landscape tablets narrower than 960px: tidy 2x2 grid */
+@media (max-width: 959px) and (min-width: 768px) and (orientation: landscape) {
+  .filter-bar {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .filter-tab {
+    white-space: normal;
+    line-height: 1.3;
+  }
 }
 
 /* Open 1px Hairline-Divided Project Index Ledger */
@@ -1941,10 +1941,15 @@
 }
 
 .mini-pill {
-  padding: 0.3rem 0.72rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.28rem;
+  padding: 0.32rem 0.75rem;
   border-radius: var(--radius-pill);
   font-family: var(--font-mono);
   font-size: 0.6875rem;
+  line-height: 1;
   white-space: nowrap;
   flex-shrink: 0;
   color: var(--ink-secondary);
@@ -3240,6 +3245,7 @@
   .web-browser-controls {
     width: 100%;
     flex-wrap: nowrap;
+    justify-content: space-between;
     overflow-x: auto;
     scrollbar-width: none;
     padding-bottom: 0.1rem;
