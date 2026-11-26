@@ -21,33 +21,9 @@ const CHEVRON_ICON_SVG = `
 `;
 
 /**
- * Hero Studio Preview Rail (1-click access to the 3 interactive previews)
+ * Sync hero project metric counter with PROJECTS_DATA length
  */
-export function renderHeroStudioPreviews() {
-  const container = document.getElementById('hero-studio-previews');
-  if (!container) return;
-
-  const featured = PROJECTS_DATA.filter((p) => p.preview);
-
-  container.innerHTML = featured
-    .map(
-      (project) => `
-        <button
-          type="button"
-          class="studio-preview-item"
-          data-open-preview="${project.index}"
-          aria-label="Launch interactive preview for ${project.title}"
-        >
-          <span class="studio-preview-meta">
-            <span class="studio-preview-name">${project.title}</span>
-            <span class="studio-preview-sub">${project.index} &middot; ${project.preview.label}</span>
-          </span>
-          <span class="studio-preview-arrow" aria-hidden="true">&rarr;</span>
-        </button>
-      `
-    )
-    .join('');
-
+export function renderHeroMetrics() {
   const heroCount = document.getElementById('hero-project-count');
   if (heroCount) {
     heroCount.textContent = String(PROJECTS_DATA.length);
@@ -419,7 +395,7 @@ export function renderCvSheet() {
 }
 
 export function renderAll() {
-  renderHeroStudioPreviews();
+  renderHeroMetrics();
   renderFilterBar('All');
   renderProjects('All');
   renderSkillsLedger();

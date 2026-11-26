@@ -262,10 +262,234 @@ function toggleNote(idx) {
   }
 }
 
+/**
+ * Interactive Liquid Purple-Chrome Metaball/Ribbon Sculpture (Hero Canvas)
+ * Reacts to pointer position, pointer velocity, and click/tap shockwave ripples.
+ */
+function initLiquidChromeSculpture() {
+  const container = document.getElementById('chrome-sculpture-container');
+  const canvas = document.getElementById('chrome-sculpture-canvas');
+  if (!container || !canvas) return;
+
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return;
+
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let width = 0;
+  let height = 0;
+  let dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+  const pointer = {
+    x: 0.3,
+    y: -0.3,
+    targetX: 0.3,
+    targetY: -0.3,
+    lastClientX: null,
+    lastClientY: null,
+    velocity: 0,
+  };
+
+  const ripples = [];
+
+  function resizeCanvas() {
+    const rect = container.getBoundingClientRect();
+    width = Math.max(1, rect.width);
+    height = Math.max(1, rect.height);
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = Math.floor(width * dpr);
+    canvas.height = Math.floor(height * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+
+  function updatePointer(clientX, clientY) {
+    const rect = container.getBoundingClientRect();
+    const nx = ((clientX - rect.left) / rect.width) * 2 - 1;
+    const ny = ((clientY - rect.top) / rect.height) * 2 - 1;
+    pointer.targetX = Math.max(-1, Math.min(1, nx));
+    pointer.targetY = Math.max(-1, Math.min(1, ny));
+
+    if (pointer.lastClientX !== null && pointer.lastClientY !== null) {
+      const dx = clientX - pointer.lastClientX;
+      const dy = clientY - pointer.lastClientY;
+      const speed = Math.min(36, Math.hypot(dx, dy));
+      pointer.velocity = Math.min(1.6, pointer.velocity + speed * 0.025);
+    }
+    pointer.lastClientX = clientX;
+    pointer.lastClientY = clientY;
+  }
+
+  function spawnShockwave(clientX, clientY) {
+    const rect = container.getBoundingClientRect();
+    ripples.push({
+      x: clientX - rect.left,
+      y: clientY - rect.top,
+      radius: 10,
+      maxRadius: Math.max(width, height) * 0.72,
+      alpha: 0.95,
+    });
+    pointer.velocity = Math.min(1.8, pointer.velocity + 0.95);
+  }
+
+  container.addEventListener('mousemove', (e) => updatePointer(e.clientX, e.clientY));
+  container.addEventListener('mouseleave', () => {
+    pointer.targetX = 0.3;
+    pointer.targetY = -0.3;
+    pointer.lastClientX = null;
+    pointer.lastClientY = null;
+  });
+  container.addEventListener('click', (e) => spawnShockwave(e.clientX, e.clientY));
+  container.addEventListener(
+    'touchstart',
+    (e) => {
+      if (e.touches && e.touches[0]) {
+        updatePointer(e.touches[0].clientX, e.touches[0].clientY);
+        spawnShockwave(e.touches[0].clientX, e.touches[0].clientY);
+      }
+    },
+    { passive: true }
+  );
+  container.addEventListener(
+    'touchmove',
+    (e) => {
+      if (e.touches && e.touches[0]) {
+        updatePointer(e.touches[0].clientX, e.touches[0].clientY);
+      }
+    },
+    { passive: true }
+  );
+
+  window.addEventListener('resize', resizeCanvas);
+  resizeCanvas();
+
+  let time = 0;
+  function animate() {
+    if (!prefersReducedMotion) {
+      time += 0.012 + pointer.velocity * 0.012;
+    }
+    pointer.x += (pointer.targetX - pointer.x) * 0.075;
+    pointer.y += (pointer.targetY - pointer.y) * 0.075;
+    pointer.velocity *= 0.93;
+
+    ctx.clearRect(0, 0, width, height);
+
+    const cx = width * 0.52 + pointer.x * 16;
+    const cy = height * 0.5 + pointer.y * 16;
+    const scale = Math.min(width, height) * 0.34;
+
+    const bloom = ctx.createRadialGradient(
+      cx + pointer.x * 38,
+      cy + pointer.y * 38,
+      scale * 0.06,
+      cx,
+      cy,
+      scale * (1.48 + pointer.velocity * 0.16)
+    );
+    bloom.addColorStop(0, `rgba(192, 132, 252, ${0.26 + pointer.velocity * 0.14})`);
+    bloom.addColorStop(0.45, 'rgba(126, 34, 206, 0.18)');
+    bloom.addColorStop(1, 'rgba(5, 5, 7, 0)');
+    ctx.fillStyle = bloom;
+    ctx.fillRect(0, 0, width, height);
+
+    let rippleDeform = 0;
+    for (let r = ripples.length - 1; r >= 0; r--) {
+      const rip = ripples[r];
+      rip.radius += 7.5;
+      rip.alpha *= 0.945;
+      rippleDeform += rip.alpha * Math.sin(rip.radius * 0.06);
+      if (rip.radius >= rip.maxRadius || rip.alpha < 0.02) {
+        ripples.splice(r, 1);
+      }
+    }
+
+    const slices = 58;
+    for (let i = 0; i < slices; i++) {
+      const u = (i / slices) * Math.PI * 2;
+      const phase = u + time * 0.52;
+      const velStretch = 1 + pointer.velocity * 0.14 + rippleDeform * 0.08;
+
+      const px =
+        cx +
+        Math.cos(phase) * scale * 0.78 * velStretch +
+        Math.sin(phase * 2.0 - time * 0.7) * scale * 0.26;
+      const py =
+        cy +
+        Math.sin(phase * 1.0) * scale * 0.68 +
+        Math.cos(phase * 3.0 + time * 0.5) * scale * 0.17;
+
+      const nextPhase = phase + 0.06;
+      const nx =
+        cx +
+        Math.cos(nextPhase) * scale * 0.78 * velStretch +
+        Math.sin(nextPhase * 2.0 - time * 0.7) * scale * 0.26;
+      const ny =
+        cy +
+        Math.sin(nextPhase * 1.0) * scale * 0.68 +
+        Math.cos(nextPhase * 3.0 + time * 0.5) * scale * 0.17;
+
+      const angle = Math.atan2(ny - py, nx - px) + Math.sin(phase * 2.0 + time) * 0.56;
+      const ribbonWidth =
+        scale * (0.44 + 0.18 * Math.sin(phase * 3.0 - time * 0.8) + pointer.velocity * 0.06);
+      const ribbonThickness = scale * (0.14 + Math.abs(rippleDeform) * 0.025);
+
+      ctx.save();
+      ctx.translate(px, py);
+      ctx.rotate(angle);
+
+      const lightOffset =
+        pointer.x * ribbonWidth * 0.48 + Math.sin(phase * 2 + pointer.y * 2) * ribbonWidth * 0.22;
+      const specPos = Math.max(0.18, Math.min(0.82, 0.5 + lightOffset / (ribbonWidth * 2.2)));
+
+      const grad = ctx.createLinearGradient(-ribbonWidth, -ribbonThickness, ribbonWidth, ribbonThickness);
+      grad.addColorStop(0, '#07050c');
+      grad.addColorStop(Math.max(0.05, specPos - 0.24), '#3b0764');
+      grad.addColorStop(Math.max(0.08, specPos - 0.1), '#a855f7');
+      grad.addColorStop(Math.max(0.1, specPos - 0.04), '#e879f9');
+      grad.addColorStop(specPos, '#ffffff');
+      grad.addColorStop(Math.min(0.92, specPos + 0.09), '#c084fc');
+      grad.addColorStop(Math.min(0.96, specPos + 0.25), '#581c87');
+      grad.addColorStop(1, '#090710');
+
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.ellipse(0, 0, ribbonWidth, ribbonThickness, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.strokeStyle = `rgba(244, 243, 248, ${0.15 + pointer.velocity * 0.12})`;
+      ctx.lineWidth = 0.85;
+      ctx.stroke();
+
+      ctx.restore();
+    }
+
+    ripples.forEach((rip) => {
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(rip.x, rip.y, rip.radius, 0, Math.PI * 2);
+      ctx.strokeStyle = `rgba(192, 132, 252, ${rip.alpha * 0.65})`;
+      ctx.lineWidth = 1.6;
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.arc(rip.x, rip.y, Math.max(1, rip.radius * 0.72), 0, Math.PI * 2);
+      ctx.strokeStyle = `rgba(244, 243, 248, ${rip.alpha * 0.35})`;
+      ctx.lineWidth = 0.9;
+      ctx.stroke();
+      ctx.restore();
+    });
+
+    if (!prefersReducedMotion) {
+      requestAnimationFrame(animate);
+    }
+  }
+
+  animate();
+}
+
 export function initInteractions({ onOpenProject, onOpenCv, onCopyText }) {
   bindRowSpotlights();
   initMagneticButtons();
   initCursorAmbientGlow();
+  initLiquidChromeSculpture();
   initScrollMechanics();
   initSectionReveals();
   initMobileMenu();

@@ -1,9 +1,12 @@
 /**
  * Validated Portfolio Projects (Deduplicated & Re-indexed 01–10)
  *
- * Each project optionally supports:
- * - `preview`: Interactive preview module config (`{ type, label }`) rendered by js/previews.js
- * - `previewImage`: Optional path to a real screenshot (e.g. 'assets/project-01.png') for future use
+ * Interactive Live Previews enabled on:
+ * - 01: cedddProjects-WEBDEV (Actual CedCycles Website)
+ * - 05: comProg_finals (C++ Hotel & Restaurant Management Console Kiosk)
+ * - 09: memore-rpg (C++ Turn-Based CLI RPG Port)
+ *
+ * Each project also supports an optional `previewImage` path for future screenshots.
  */
 
 export const PROJECT_CATEGORIES = [
@@ -25,8 +28,8 @@ export const PROJECTS_DATA = [
     stack: ['HTML', 'CSS', 'JavaScript', 'PHP', 'MySQL', 'React', 'Node.js'],
     linkedSkills: ['HTML', 'CSS', 'JavaScript', 'PHP', 'MySQL'],
     preview: {
-      type: 'cedcycles-storefront',
-      label: 'Interactive Storefront',
+      type: 'cedcycles-site',
+      label: 'Live Website Preview',
     },
     previewImage: null,
   },
@@ -79,7 +82,10 @@ export const PROJECTS_DATA = [
       'Co-developed a 2-person C++ console application, handling persistent file I/O operations and the core interactive kiosk workflow.',
     stack: ['C++', 'File I/O', 'CLI'],
     linkedSkills: ['C++'],
-    preview: null,
+    preview: {
+      type: 'comprog-kiosk',
+      label: 'C++ Console Kiosk',
+    },
     previewImage: null,
   },
   {
@@ -105,10 +111,7 @@ export const PROJECTS_DATA = [
       'Managed session hosting and multiplayer connectivity, organized game asset pipelines, and executed integrated testing and performance optimization alongside one teammate.',
     stack: ['Multiplayer Networking', 'Asset Pipeline', 'Integration QA'],
     linkedSkills: [],
-    preview: {
-      type: 'hakton-tabletop',
-      label: 'Multiplayer Lobby & Board',
-    },
+    preview: null,
     previewImage: null,
   },
   {
@@ -121,10 +124,7 @@ export const PROJECTS_DATA = [
       'Implemented audio integration, sound design cues, and player progression tracking across game stages for the group final project.',
     stack: ['React', 'Phaser', 'Zustand', 'Audio Systems'],
     linkedSkills: ['JavaScript'],
-    preview: {
-      type: 'kain-culinary',
-      label: 'Culinary Puzzle Stage',
-    },
+    preview: null,
     previewImage: null,
   },
   {
@@ -137,7 +137,10 @@ export const PROJECTS_DATA = [
       "Ported the group's Python RPG project into a standalone C++ build while maintaining shared game data structures and core mechanics.",
     stack: ['C++', 'Python', 'File Parsing', 'CLI'],
     linkedSkills: ['C++'],
-    preview: null,
+    preview: {
+      type: 'memore-rpg-cli',
+      label: 'C++ Turn-Based RPG',
+    },
     previewImage: null,
   },
   {
