@@ -25,8 +25,8 @@ export const PROJECTS_DATA = [
     role: 'Solo Full-Stack Developer · Cycling Retail Web App (Web Dev 2 Finals)',
     summary:
       'Built a solo full-stack cycling retail web application (CedCycles) fulfilling the Web Development 2 course final requirement, handling storefront product browsing, cart state, server-side routing, and database persistence end-to-end.',
-    stack: ['HTML', 'CSS', 'JavaScript', 'PHP', 'MySQL', 'React', 'Node.js'],
-    linkedSkills: ['HTML', 'CSS', 'JavaScript', 'PHP', 'MySQL'],
+    stack: ['React', 'Express', 'MongoDB', 'Node.js', 'JavaScript', 'HTML', 'CSS'],
+    linkedSkills: ['HTML', 'CSS', 'JavaScript'],
     preview: {
       type: 'cedcycles-site',
       label: 'Live Website Preview',
@@ -41,8 +41,8 @@ export const PROJECTS_DATA = [
     role: 'Backend Developer · Science, Technology & Society (STS) Prototype',
     summary:
       'Built the backend services, API endpoints, and database structure for an STS course prototype.',
-    stack: ['JavaScript', 'Node.js', 'Firebase', 'REST API'],
-    linkedSkills: ['JavaScript', 'Firebase'],
+    stack: ['Dart', 'Flutter', 'Firebase Auth', 'Firestore', 'Geolocator'],
+    linkedSkills: ['Dart', 'Firebase'],
     preview: null,
     previewImage: null,
   },
@@ -67,8 +67,8 @@ export const PROJECTS_DATA = [
     role: 'Feature Developer (Monthly Spending Overview) · OOP Finals',
     summary:
       'Developed the monthly spending overview module in a Java desktop application built in NetBeans for the Object-Oriented Programming course.',
-    stack: ['Java', 'NetBeans', 'Swing', 'OOP'],
-    linkedSkills: ['Java', 'SQLite'],
+    stack: ['Java', 'Swing', 'MySQL', 'Maven', 'NetBeans'],
+    linkedSkills: ['Java', 'MySQL'],
     preview: null,
     previewImage: null,
   },
@@ -96,8 +96,8 @@ export const PROJECTS_DATA = [
     role: 'Hardware Lead · Technopreneurship Prototype (Presented at CESCON)',
     summary:
       'Handled hardware assembly for a working app-and-hardware prototype presented at CESCON—including soldering, wiring, circuit integration, and physical hardware testing.',
-    stack: ['Hardware Assembly', 'Soldering', 'Circuit Wiring', 'Sensors'],
-    linkedSkills: ['Soldering'],
+    stack: ['Hardware Assembly', 'Soldering', 'Circuit Wiring', 'Kotlin', 'Firebase', 'ESP32'],
+    linkedSkills: ['Soldering', 'Kotlin', 'Firebase'],
     preview: null,
     previewImage: null,
   },
@@ -108,9 +108,9 @@ export const PROJECTS_DATA = [
     repo: 'https://github.com/Diggeh/Hakton_TableTop',
     role: 'Connectivity, Assets & QA Co-Lead · Software Engineering 2 Finals',
     summary:
-      'Managed session hosting and multiplayer connectivity, SQLite data persistence, game asset pipelines, and integrated testing and performance optimization alongside one teammate.',
-    stack: ['Multiplayer Networking', 'SQLite', 'Asset Pipeline', 'Integration QA'],
-    linkedSkills: ['SQLite'],
+      'Managed session hosting and multiplayer connectivity, organized game asset pipelines, and executed integrated testing and performance optimization alongside one teammate.',
+    stack: ['Electron', 'React', 'Socket.IO', 'WebRTC', 'SQLite', 'Three.js'],
+    linkedSkills: ['SQLite', 'JavaScript', 'CSS'],
     preview: null,
     previewImage: null,
   },
@@ -122,8 +122,8 @@ export const PROJECTS_DATA = [
     role: 'Sound Design & Progress Tracking · Software Engineering 1 Finals',
     summary:
       'Implemented audio integration, sound design cues, and player progression tracking across game stages for the group final project.',
-    stack: ['React', 'Phaser', 'Zustand', 'Audio Systems'],
-    linkedSkills: ['JavaScript'],
+    stack: ['React', 'Phaser', 'Zustand', 'Howler.js', 'Express', 'MongoDB'],
+    linkedSkills: ['JavaScript', 'CSS'],
     preview: null,
     previewImage: null,
   },
@@ -135,8 +135,8 @@ export const PROJECTS_DATA = [
     role: 'C++ Port Developer · Programming Languages Finals',
     summary:
       "Ported the group's Python RPG project into a standalone C++ build while maintaining shared game data structures and core mechanics.",
-    stack: ['C++', 'Python', 'File Parsing', 'CLI'],
-    linkedSkills: ['C++', 'Python'],
+    stack: ['C++', 'Python', 'Java', 'JSON', 'CLI'],
+    linkedSkills: ['C++', 'Python', 'Java'],
     preview: {
       type: 'memore-rpg-cli',
       label: 'C++ Turn-Based RPG',
@@ -151,7 +151,7 @@ export const PROJECTS_DATA = [
     role: 'Move Library & Recorder Lead (src/library.py)',
     summary:
       'Developed the Move Library & Recorder module (src/library.py on feature/library) to capture, structure, and store Arnis strike sequences for recognition training.',
-    stack: ['Python', 'PyTorch', 'OpenCV', 'Git'],
+    stack: ['Python', 'MediaPipe', 'PyTorch', 'OpenCV', 'NumPy'],
     linkedSkills: ['Python'],
     preview: null,
     previewImage: null,
