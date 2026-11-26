@@ -315,6 +315,10 @@ function initScrollMechanics() {
         Math.max(0, (start - tRect.top) / (start - end + tRect.height * 0.45))
       );
       eduRail.style.height = `${(progress * 100).toFixed(1)}%`;
+      const eduNodes = document.querySelectorAll('#education-entries .timeline-node');
+      eduNodes.forEach((node, idx) => {
+        node.classList.toggle('is-reached', progress >= (idx === 0 ? 0.08 : 0.56));
+      });
     }
   }
 
@@ -411,6 +415,44 @@ function initScrollMechanics() {
   updateScrollUI();
 }
 
+function animateHeroMetrics() {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const metricEls = document.querySelectorAll('.hero-metrics .metric-value');
+  if (metricEls.length === 0) return;
+
+  const targets = Array.from(metricEls).map((el) => {
+    const raw = (el.dataset.targetText || el.textContent).trim();
+    el.dataset.targetText = raw;
+    const match = raw.match(/^(\d+(?:\.\d+)?)(.*)$/);
+    if (!match) return null;
+    const numStr = match[1];
+    const decimals = numStr.includes('.') ? numStr.split('.')[1].length : 0;
+    return { el, end: parseFloat(numStr), decimals, suffix: match[2], raw };
+  }).filter(Boolean);
+
+  if (targets.length === 0) return;
+
+  const duration = 640;
+  const startTime = performance.now();
+
+  function tick(now) {
+    const p = Math.min(1, (now - startTime) / duration);
+    const eased = 1 - Math.pow(1 - p, 3);
+    for (const t of targets) {
+      if (p >= 1) {
+        t.el.textContent = t.raw;
+      } else {
+        const val = t.end * eased;
+        const formatted = t.decimals > 0 ? val.toFixed(t.decimals) : String(Math.round(val));
+        t.el.textContent = `${formatted}${t.suffix}`;
+      }
+    }
+    if (p < 1) requestAnimationFrame(tick);
+  }
+
+  requestAnimationFrame(tick);
+}
+
 function initSectionReveals() {
   const sections = document.querySelectorAll('.reveal-section');
   if (!('IntersectionObserver' in window)) {
@@ -424,13 +466,19 @@ function initSectionReveals() {
     return;
   }
 
+  animateHeroMetrics();
+
   const observer = new IntersectionObserver(
     (entries) => {
       entries.forEach((entry) => {
         const el = entry.target;
         if (entry.isIntersecting) {
+          const wasVisible = el.classList.contains('is-visible');
           el.classList.remove('is-exiting');
           el.classList.add('is-visible');
+          if (!wasVisible && el.classList.contains('hero-section')) {
+            animateHeroMetrics();
+          }
         } else {
           const exitDir = entry.boundingClientRect.top < 0 ? 'up' : 'down';
           el.dataset.exit = exitDir;
@@ -530,6 +578,8 @@ function toggleNote(idx) {
 
   body.classList.toggle('open', !isOpen);
   chevron.classList.toggle('is-open', !isOpen);
+  const noteItem = body.closest('.note-item');
+  if (noteItem) noteItem.classList.toggle('is-open', !isOpen);
   if (trigger) {
     trigger.setAttribute('aria-expanded', String(!isOpen));
   }
@@ -549,16 +599,33 @@ function initLiquidChromeSculpture() {
 
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const isCoarse = window.matchMedia('(pointer: coarse)').matches;
-  const slices = isCoarse ? 26 : 46;
-  const minFrameMs = isCoarse ? 33 : 0;
+  const slices = isCoarse ? 24 : 44;
   let containerWidth = 0;
   let containerHeight = 0;
   let canvasWidth = 0;
   let canvasHeight = 0;
+  let containerRect = null;
+  let canvasRect = null;
   let dpr = Math.min(window.devicePixelRatio || 1, isCoarse ? 1 : 1.5);
   let inViewport = true;
   let rafId = null;
-  let lastDrawTime = 0;
+  let lastTouchTime = 0;
+
+  // Pre-build quantized unit-space gradients once (zero per-frame gradient/string allocations)
+  const GRAD_BUCKETS = 13;
+  const unitGradients = Array.from({ length: GRAD_BUCKETS }, (_, b) => {
+    const specPos = 0.2 + (b / (GRAD_BUCKETS - 1)) * 0.6;
+    const g = ctx.createLinearGradient(-1, -1, 1, 1);
+    g.addColorStop(0, '#07050c');
+    g.addColorStop(Math.max(0.05, specPos - 0.24), '#3b0764');
+    g.addColorStop(Math.max(0.08, specPos - 0.1), '#a855f7');
+    g.addColorStop(Math.max(0.1, specPos - 0.04), '#e879f9');
+    g.addColorStop(specPos, '#ffffff');
+    g.addColorStop(Math.min(0.92, specPos + 0.09), '#c084fc');
+    g.addColorStop(Math.min(0.96, specPos + 0.25), '#581c87');
+    g.addColorStop(1, '#090710');
+    return g;
+  });
 
   const pointer = {
     x: 0.3,
@@ -572,9 +639,13 @@ function initLiquidChromeSculpture() {
 
   const ripples = [];
 
+  function refreshRects() {
+    containerRect = container.getBoundingClientRect();
+    canvasRect = canvas.getBoundingClientRect();
+  }
+
   function resizeCanvas() {
-    const containerRect = container.getBoundingClientRect();
-    const canvasRect = canvas.getBoundingClientRect();
+    refreshRects();
     containerWidth = Math.max(1, containerRect.width);
     containerHeight = Math.max(1, containerRect.height);
     canvasWidth = Math.max(1, canvasRect.width);
@@ -586,9 +657,9 @@ function initLiquidChromeSculpture() {
   }
 
   function updatePointer(clientX, clientY) {
-    const rect = container.getBoundingClientRect();
-    const nx = ((clientX - rect.left) / rect.width) * 2 - 1;
-    const ny = ((clientY - rect.top) / rect.height) * 2 - 1;
+    if (!containerRect) refreshRects();
+    const nx = ((clientX - containerRect.left) / Math.max(1, containerRect.width)) * 2 - 1;
+    const ny = ((clientY - containerRect.top) / Math.max(1, containerRect.height)) * 2 - 1;
     pointer.targetX = Math.max(-1, Math.min(1, nx));
     pointer.targetY = Math.max(-1, Math.min(1, ny));
 
@@ -603,7 +674,7 @@ function initLiquidChromeSculpture() {
   }
 
   function spawnShockwave(clientX, clientY) {
-    const canvasRect = canvas.getBoundingClientRect();
+    if (!canvasRect) refreshRects();
     ripples.push({
       x: clientX - canvasRect.left,
       y: clientY - canvasRect.top,
@@ -621,10 +692,15 @@ function initLiquidChromeSculpture() {
     pointer.lastClientX = null;
     pointer.lastClientY = null;
   });
-  container.addEventListener('click', (e) => spawnShockwave(e.clientX, e.clientY));
+  container.addEventListener('click', (e) => {
+    if (performance.now() - lastTouchTime < 450) return;
+    spawnShockwave(e.clientX, e.clientY);
+  });
   container.addEventListener(
     'touchstart',
     (e) => {
+      lastTouchTime = performance.now();
+      refreshRects();
       if (e.touches && e.touches[0]) {
         updatePointer(e.touches[0].clientX, e.touches[0].clientY);
         spawnShockwave(e.touches[0].clientX, e.touches[0].clientY);
@@ -635,6 +711,7 @@ function initLiquidChromeSculpture() {
   container.addEventListener(
     'touchmove',
     (e) => {
+      lastTouchTime = performance.now();
       if (e.touches && e.touches[0]) {
         updatePointer(e.touches[0].clientX, e.touches[0].clientY);
       }
@@ -642,25 +719,21 @@ function initLiquidChromeSculpture() {
     { passive: true }
   );
 
-  window.addEventListener('resize', resizeCanvas);
+  window.addEventListener('scroll', refreshRects, { passive: true });
+  window.addEventListener('resize', resizeCanvas, { passive: true });
   resizeCanvas();
 
   let time = 0;
-  function animate(now = performance.now()) {
+  const lerpRate = isCoarse ? 0.16 : 0.09;
+  function animate() {
     rafId = null;
     if (!inViewport || document.hidden || document.body.classList.contains('modal-open')) return;
 
-    if (minFrameMs > 0 && now - lastDrawTime < minFrameMs) {
-      rafId = requestAnimationFrame(animate);
-      return;
-    }
-    lastDrawTime = now;
-
     if (!prefersReducedMotion) {
-      time += (isCoarse ? 0.018 : 0.012) + pointer.velocity * 0.012;
+      time += 0.012 + pointer.velocity * 0.012;
     }
-    pointer.x += (pointer.targetX - pointer.x) * 0.075;
-    pointer.y += (pointer.targetY - pointer.y) * 0.075;
+    pointer.x += (pointer.targetX - pointer.x) * lerpRate;
+    pointer.y += (pointer.targetY - pointer.y) * lerpRate;
     pointer.velocity *= 0.93;
 
     ctx.clearRect(0, 0, canvasWidth, canvasHeight);
@@ -695,6 +768,8 @@ function initLiquidChromeSculpture() {
       }
     }
 
+    const strokeStyle = !isCoarse ? `rgba(244, 243, 248, ${0.15 + pointer.velocity * 0.12})` : null;
+
     for (let i = 0; i < slices; i++) {
       const u = (i / slices) * Math.PI * 2;
       const phase = u + time * 0.52;
@@ -722,34 +797,32 @@ function initLiquidChromeSculpture() {
       const angle = Math.atan2(ny - py, nx - px) + Math.sin(phase * 2.0 + time) * 0.56;
       const ribbonWidth =
         scale * (0.44 + 0.18 * Math.sin(phase * 3.0 - time * 0.8) + pointer.velocity * 0.06);
-      const ribbonThickness = scale * (0.14 + Math.abs(rippleDeform) * 0.025);
+      const ribbonThickness = scale * ((isCoarse ? 0.165 : 0.14) + Math.abs(rippleDeform) * 0.025);
+
+      const lightOffset =
+        pointer.x * ribbonWidth * 0.48 + Math.sin(phase * 2 + pointer.y * 2) * ribbonWidth * 0.22;
+      const specPos = Math.max(0.2, Math.min(0.8, 0.5 + lightOffset / (ribbonWidth * 2.2)));
+      const bucket = Math.min(
+        GRAD_BUCKETS - 1,
+        Math.max(0, Math.round(((specPos - 0.2) / 0.6) * (GRAD_BUCKETS - 1)))
+      );
 
       ctx.save();
       ctx.translate(px, py);
       ctx.rotate(angle);
+      ctx.scale(ribbonWidth, ribbonThickness);
 
-      const lightOffset =
-        pointer.x * ribbonWidth * 0.48 + Math.sin(phase * 2 + pointer.y * 2) * ribbonWidth * 0.22;
-      const specPos = Math.max(0.18, Math.min(0.82, 0.5 + lightOffset / (ribbonWidth * 2.2)));
-
-      const grad = ctx.createLinearGradient(-ribbonWidth, -ribbonThickness, ribbonWidth, ribbonThickness);
-      grad.addColorStop(0, '#07050c');
-      grad.addColorStop(Math.max(0.05, specPos - 0.24), '#3b0764');
-      grad.addColorStop(Math.max(0.08, specPos - 0.1), '#a855f7');
-      grad.addColorStop(Math.max(0.1, specPos - 0.04), '#e879f9');
-      grad.addColorStop(specPos, '#ffffff');
-      grad.addColorStop(Math.min(0.92, specPos + 0.09), '#c084fc');
-      grad.addColorStop(Math.min(0.96, specPos + 0.25), '#581c87');
-      grad.addColorStop(1, '#090710');
-
-      ctx.fillStyle = grad;
+      ctx.fillStyle = unitGradients[bucket];
       ctx.beginPath();
-      ctx.ellipse(0, 0, ribbonWidth, ribbonThickness, 0, 0, Math.PI * 2);
+      ctx.arc(0, 0, 1, 0, Math.PI * 2);
       ctx.fill();
 
-      ctx.strokeStyle = `rgba(244, 243, 248, ${0.15 + pointer.velocity * 0.12})`;
-      ctx.lineWidth = 0.85;
-      ctx.stroke();
+      if (strokeStyle) {
+        ctx.scale(1 / ribbonWidth, 1 / ribbonThickness);
+        ctx.strokeStyle = strokeStyle;
+        ctx.lineWidth = 0.85;
+        ctx.stroke();
+      }
 
       ctx.restore();
     }

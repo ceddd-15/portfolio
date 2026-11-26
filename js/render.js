@@ -188,8 +188,8 @@ export function renderSkillsLedger() {
           <div class="skill-pill-group">
             ${tier.items
               .map(
-                (skill) => `
-                  <button type="button" data-skill="${skill}" class="skill-pill">
+                (skill, pillIdx) => `
+                  <button type="button" data-skill="${skill}" style="--pill-i:${pillIdx}" class="skill-pill">
                     ${skill}
                   </button>
                 `
@@ -255,7 +255,7 @@ export function renderBuildNotes() {
 
   container.innerHTML = NOTES_DATA.map(
     (note, idx) => `
-      <article class="note-item">
+      <article class="note-item ${note.defaultOpen ? 'is-open' : ''}">
         <button
           type="button"
           data-note-toggle="${idx}"

@@ -577,6 +577,7 @@
   font-weight: 700;
   font-size: clamp(1.3rem, 2.2vw, 1.65rem);
   letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
   color: var(--ink-primary);
 }
 
@@ -1107,7 +1108,7 @@
   align-items: center;
   justify-content: center;
   color: var(--ink-secondary);
-  transition: color 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
+  transition: color 0.2s ease, border-color 0.2s ease, background-color 0.2s ease, transform 0.22s var(--ease-expo);
 }
 
 .row-icon-link:hover {
@@ -1124,7 +1125,12 @@
   color: var(--ink-secondary);
   border: 1px solid var(--border-specular);
   background: rgba(9, 7, 16, 0.5);
-  transition: color 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
+  transition: color 0.2s ease, border-color 0.2s ease, background-color 0.2s ease, transform 0.22s var(--ease-expo);
+}
+
+.project-index-row:hover .row-icon-link,
+.project-index-row:hover .row-details-btn {
+  transform: translateY(-1px);
 }
 
 .project-index-row:hover .row-details-btn {
@@ -1465,6 +1471,23 @@
   font-size: 0.9rem;
   color: var(--ink-secondary);
   line-height: 1.72;
+  opacity: 0;
+  transform: translate3d(0, -6px, 0);
+  transition: opacity 0.28s ease, transform 0.32s var(--ease-expo);
+}
+
+.smooth-collapse.open .note-body-text {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+
+.note-item.is-open .note-title {
+  color: var(--violet-specular);
+}
+
+.note-item.is-open .note-chevron-wrap {
+  border-color: rgba(216, 180, 254, 0.45);
+  color: var(--chrome-white);
 }
 
 @media (min-width: 640px) {
@@ -1562,11 +1585,17 @@
   border-radius: 50%;
   background: var(--bg-void);
   border: 2px solid var(--violet-chrome);
+  transition: transform 0.28s var(--ease-expo), box-shadow 0.28s ease, border-color 0.28s ease;
 }
 
-.timeline-node.is-accent {
+.timeline-node.is-accent,
+.timeline-node.is-reached {
   border-color: var(--violet-specular);
   box-shadow: 0 0 12px var(--violet-vivid);
+}
+
+.timeline-node.is-reached {
+  transform: scale(1.18);
 }
 
 .timeline-entry-head {
