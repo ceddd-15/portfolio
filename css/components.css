@@ -41,10 +41,12 @@
 
 .scroll-progress-bar {
   height: 100%;
-  width: 0;
+  width: 100%;
+  transform: scaleX(0);
+  transform-origin: left center;
   background: linear-gradient(90deg, var(--violet-mid) 0%, var(--violet-vivid) 55%, var(--chrome-white) 100%);
   box-shadow: 0 0 14px rgba(216, 180, 254, 0.85);
-  transition: width 75ms ease-out;
+  will-change: transform;
 }
 
 /* --------------------------------------------------------------------------
@@ -584,126 +586,6 @@
   font-size: 0.6875rem;
   color: var(--ink-secondary);
   margin-top: 0.15rem;
-}
-
-/* Hero Right: Minimal Translucent Studio Preview Launcher Rail */
-.hero-studio-panel {
-  background: var(--glass-bg);
-  backdrop-filter: blur(var(--glass-blur));
-  -webkit-backdrop-filter: blur(var(--glass-blur));
-  border: 1px solid var(--border-specular);
-  border-radius: var(--radius-xl);
-  padding: 1.35rem 1.4rem;
-  box-shadow: var(--shadow-glass);
-  position: relative;
-  overflow: hidden;
-}
-
-.hero-studio-panel::before {
-  content: '';
-  position: absolute;
-  inset: 0 0 auto 0;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(233, 213, 255, 0.65), transparent);
-  pointer-events: none;
-}
-
-.studio-panel-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem;
-  padding-bottom: 0.9rem;
-  border-bottom: 1px solid var(--border-hairline);
-}
-
-.studio-panel-title {
-  font-family: var(--font-mono);
-  font-size: 0.6875rem;
-  text-transform: uppercase;
-  letter-spacing: 0.16em;
-  color: var(--violet-lavender);
-}
-
-.studio-panel-tag {
-  font-family: var(--font-mono);
-  font-size: 0.65rem;
-  color: var(--ink-muted);
-}
-
-.studio-preview-list {
-  display: flex;
-  flex-direction: column;
-}
-
-.studio-preview-item {
-  width: 100%;
-  text-align: left;
-  padding: 0.85rem 0.25rem;
-  border-bottom: 1px solid var(--border-hairline);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem;
-  transition: transform 0.24s var(--ease-expo), color 0.2s ease;
-}
-
-.studio-preview-item:last-child {
-  border-bottom: none;
-  padding-bottom: 0.2rem;
-}
-
-.studio-preview-item:hover {
-  transform: translateX(4px);
-}
-
-.studio-preview-meta {
-  display: flex;
-  flex-direction: column;
-  gap: 0.15rem;
-  min-width: 0;
-}
-
-.studio-preview-name {
-  font-family: var(--font-display);
-  font-size: 0.92rem;
-  font-weight: 600;
-  color: var(--ink-primary);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  transition: color 0.2s ease;
-}
-
-.studio-preview-item:hover .studio-preview-name {
-  color: var(--violet-lavender);
-}
-
-.studio-preview-sub {
-  font-family: var(--font-mono);
-  font-size: 0.6875rem;
-  color: var(--ink-muted);
-}
-
-.studio-preview-arrow {
-  width: 1.85rem;
-  height: 1.85rem;
-  border-radius: var(--radius-pill);
-  border: 1px solid var(--border-specular);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  color: var(--violet-lavender);
-  flex-shrink: 0;
-  transition: background-color 0.22s ease, border-color 0.22s ease, color 0.22s ease;
-}
-
-.studio-preview-item:hover .studio-preview-arrow {
-  background: rgba(168, 85, 247, 0.22);
-  border-color: var(--violet-specular);
-  color: var(--chrome-white);
 }
 
 /* --------------------------------------------------------------------------
@@ -1547,11 +1429,14 @@
   position: absolute;
   left: -0.5px;
   top: 0.4rem;
+  bottom: 0.4rem;
   width: 2px;
-  height: 0;
+  transform: scaleY(0);
+  transform-origin: top center;
   background: linear-gradient(180deg, var(--chrome-white) 0%, var(--violet-vivid) 52%, var(--violet-deep) 100%);
   box-shadow: 0 0 12px rgba(216, 180, 254, 0.78);
-  transition: height 140ms ease-out;
+  transition: transform 140ms ease-out;
+  will-change: transform;
 }
 
 .timeline-exp-rail {
@@ -1652,9 +1537,7 @@
    -------------------------------------------------------------------------- */
 .site-footer {
   border-top: 1px solid var(--border-specular);
-  background: rgba(5, 5, 7, 0.82);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  background: rgba(6, 5, 11, 0.92);
 }
 
 .footer-inner {

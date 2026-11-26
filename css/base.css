@@ -180,13 +180,12 @@ img {
 /* Subtle Translucent Obsidian Reading Sheet for Crisp Legibility Over Liquid Silk */
 .section-glass-surface {
   position: relative;
+  overflow: hidden;
   background: linear-gradient(
     180deg,
-    rgba(7, 6, 12, 0.62) 0%,
-    rgba(7, 6, 12, 0.48) 100%
+    rgba(9, 7, 16, 0.84) 0%,
+    rgba(7, 6, 12, 0.76) 100%
   );
-  backdrop-filter: blur(var(--glass-blur));
-  -webkit-backdrop-filter: blur(var(--glass-blur));
   border: 1px solid var(--border-specular);
   border-radius: var(--radius-xl);
   padding: clamp(1.5rem, 3.6vw, 2.75rem);

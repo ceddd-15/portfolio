@@ -138,7 +138,13 @@ export function openInspectModal(projectIndex, initialTab = 'overview') {
 
   if (stackEl) {
     stackEl.innerHTML = project.stack
-      .map((tech) => `<span class="modal-stack-chip">${tech}</span>`)
+      .map((tech) => {
+        const safe = String(tech)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;');
+        return `<span class="modal-stack-chip">${safe}</span>`;
+      })
       .join('');
   }
 
@@ -168,6 +174,11 @@ export function closeInspectModal() {
   if (!modal || modal.classList.contains('hidden')) return;
   modal.classList.add('hidden');
   document.body.classList.remove('modal-open');
+  const previewPane = document.getElementById('inspect-preview-pane');
+  if (previewPane) {
+    previewPane.innerHTML = '';
+    delete previewPane.dataset.mountedFor;
+  }
   currentInspectProject = null;
   restoreFocus();
 }

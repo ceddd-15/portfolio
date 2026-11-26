@@ -259,7 +259,7 @@ function startWebGLRenderer(canvas, prefersReducedMotion) {
   const uMouse = gl.getUniformLocation(program, 'uMouse');
 
   const mouse = { x: 0.35, y: 0.32, targetX: 0.35, targetY: 0.32 };
-  const minFrameMs = isMobileGpu ? 42 : 16;
+  const minFrameMs = isMobileGpu ? 42 : 32;
   let rafId = null;
   let running = true;
   let lastDrawTime = 0;
@@ -267,11 +267,11 @@ function startWebGLRenderer(canvas, prefersReducedMotion) {
   const startTime = performance.now();
 
   function resize() {
-    // Low-frequency liquid silk upscales cleanly via bilinear filtering; protect low-core mobile GPUs
+    // Low-frequency liquid silk upscales cleanly via bilinear filtering; protect GPU bandwidth
     const cssW = Math.max(1, window.innerWidth);
     const cssH = Math.max(1, window.innerHeight);
-    const maxPixels = isMobileGpu ? 0.22e6 : 0.55e6;
-    const dprCap = isMobileGpu ? 1.0 : 1.2;
+    const maxPixels = isMobileGpu ? 0.2e6 : 0.36e6;
+    const dprCap = isMobileGpu ? 1.0 : 1.1;
     const scale = Math.min(dprCap, Math.sqrt(maxPixels / (cssW * cssH)));
     const width = Math.max(1, Math.floor(cssW * scale));
     const height = Math.max(1, Math.floor(cssH * scale));
@@ -309,8 +309,8 @@ function startWebGLRenderer(canvas, prefersReducedMotion) {
     rafId = null;
     if (shouldPause()) return;
 
-    // Yield 100% GPU bandwidth to native scroll compositing on mobile/tablet devices
-    if (isMobileGpu && now < scrollPauseUntil) {
+    // Yield GPU bandwidth to native scroll compositing
+    if (now < scrollPauseUntil) {
       scheduleNext();
       return;
     }
@@ -337,15 +337,13 @@ function startWebGLRenderer(canvas, prefersReducedMotion) {
   window.addEventListener('pointermove', onPointerMove, { passive: true });
   window.addEventListener('touchstart', onTouch, { passive: true });
   window.addEventListener('touchmove', onTouch, { passive: true });
-  if (isMobileGpu) {
-    window.addEventListener(
-      'scroll',
-      () => {
-        scrollPauseUntil = performance.now() + 140;
-      },
-      { passive: true }
-    );
-  }
+  window.addEventListener(
+    'scroll',
+    () => {
+      scrollPauseUntil = performance.now() + (isMobileGpu ? 140 : 100);
+    },
+    { passive: true }
+  );
   document.addEventListener('visibilitychange', () => {
     if (!shouldPause()) scheduleNext();
   });
@@ -408,7 +406,28 @@ function startCanvas2DFallback(canvas, prefersReducedMotion) {
   resize();
 
   let t = 0;
-  function draw() {
+  let rafId = null;
+  let lastDrawTime = 0;
+
+  function shouldPause() {
+    return document.hidden || document.body.classList.contains('modal-open');
+  }
+
+  function scheduleNext() {
+    if (!prefersReducedMotion && !shouldPause() && !rafId) {
+      rafId = requestAnimationFrame(draw);
+    }
+  }
+
+  function draw(now = performance.now()) {
+    rafId = null;
+    if (shouldPause()) return;
+    if (!prefersReducedMotion && now - lastDrawTime < 32) {
+      scheduleNext();
+      return;
+    }
+    lastDrawTime = now;
+
     mouse.x += (mouse.targetX - mouse.x) * 0.09;
     mouse.y += (mouse.targetY - mouse.y) * 0.09;
     if (!prefersReducedMotion) t += 0.008;
@@ -454,12 +473,26 @@ function startCanvas2DFallback(canvas, prefersReducedMotion) {
     }
 
     ctx.globalAlpha = 1;
-    if (!prefersReducedMotion) {
-      requestAnimationFrame(draw);
-    }
+    scheduleNext();
   }
 
-  draw();
+  document.addEventListener('visibilitychange', () => {
+    if (!shouldPause()) scheduleNext();
+  });
+
+  if (typeof MutationObserver !== 'undefined') {
+    const bodyObserver = new MutationObserver(() => {
+      if (shouldPause() && rafId) {
+        cancelAnimationFrame(rafId);
+        rafId = null;
+      } else {
+        scheduleNext();
+      }
+    });
+    bodyObserver.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+  }
+
+  draw(performance.now());
   return { mode: 'canvas2d' };
 }
 

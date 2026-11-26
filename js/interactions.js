@@ -8,15 +8,34 @@ import { renderProjects, renderSkillLinkedProjects } from './render.js';
 let activeSkillFilter = null;
 
 /**
- * Cursor-tracking radial hover spotlight on each project index row
+ * Cursor-tracking radial hover spotlight on each project index row (rAF-throttled)
  */
 export function bindRowSpotlights() {
+  if (window.matchMedia('(hover: none)').matches) return;
   const rows = document.querySelectorAll('.project-index-row');
   rows.forEach((row) => {
+    let rect = null;
+    let pendingX = 0;
+    let pendingY = 0;
+    let rafId = null;
+
+    row.addEventListener('mouseenter', () => {
+      rect = row.getBoundingClientRect();
+    });
     row.addEventListener('mousemove', (e) => {
-      const rect = row.getBoundingClientRect();
-      row.style.setProperty('--mouse-x', `${e.clientX - rect.left}px`);
-      row.style.setProperty('--mouse-y', `${e.clientY - rect.top}px`);
+      if (!rect) rect = row.getBoundingClientRect();
+      pendingX = e.clientX - rect.left;
+      pendingY = e.clientY - rect.top;
+      if (!rafId) {
+        rafId = requestAnimationFrame(() => {
+          rafId = null;
+          row.style.setProperty('--mouse-x', `${pendingX}px`);
+          row.style.setProperty('--mouse-y', `${pendingY}px`);
+        });
+      }
+    }, { passive: true });
+    row.addEventListener('mouseleave', () => {
+      rect = null;
     });
   });
 }
@@ -47,13 +66,31 @@ function initMagneticButtons() {
 
   const magneticEls = document.querySelectorAll('[data-magnetic]');
   magneticEls.forEach((el) => {
-    el.addEventListener('mousemove', (e) => {
-      const rect = el.getBoundingClientRect();
-      const dx = e.clientX - (rect.left + rect.width / 2);
-      const dy = e.clientY - (rect.top + rect.height / 2);
-      el.style.transform = `translate(${(dx * 0.2).toFixed(1)}px, ${(dy * 0.24).toFixed(1)}px)`;
+    let rect = null;
+    let pendingDx = 0;
+    let pendingDy = 0;
+    let rafId = null;
+
+    el.addEventListener('mouseenter', () => {
+      rect = el.getBoundingClientRect();
     });
+    el.addEventListener('mousemove', (e) => {
+      if (!rect) rect = el.getBoundingClientRect();
+      pendingDx = e.clientX - (rect.left + rect.width / 2);
+      pendingDy = e.clientY - (rect.top + rect.height / 2);
+      if (!rafId) {
+        rafId = requestAnimationFrame(() => {
+          rafId = null;
+          el.style.transform = `translate(${(pendingDx * 0.2).toFixed(1)}px, ${(pendingDy * 0.24).toFixed(1)}px)`;
+        });
+      }
+    }, { passive: true });
     el.addEventListener('mouseleave', () => {
+      rect = null;
+      if (rafId) {
+        cancelAnimationFrame(rafId);
+        rafId = null;
+      }
       el.style.transform = 'translate(0px, 0px)';
     });
   });
@@ -156,10 +193,25 @@ function initScrollMechanics() {
 
   let cachedSurfaces = Array.from(document.querySelectorAll('.section-glass-surface'));
   let cachedOccluders = Array.from(document.querySelectorAll(occluderSelector));
+  let cachedEduNodes = Array.from(document.querySelectorAll('#education-entries .timeline-node'));
+  let cachedSectionTops = {};
+  let cachedNavBottom = navShell ? navShell.getBoundingClientRect().bottom : 72;
+  let cachedWinH = window.innerHeight;
+  let cachedDocMax = Math.max(0, document.documentElement.scrollHeight - cachedWinH);
 
   function refreshScrollCaches() {
     cachedSurfaces = Array.from(document.querySelectorAll('.section-glass-surface'));
     cachedOccluders = Array.from(document.querySelectorAll(occluderSelector));
+    cachedEduNodes = Array.from(document.querySelectorAll('#education-entries .timeline-node'));
+    cachedWinH = window.innerHeight;
+    cachedDocMax = Math.max(0, document.documentElement.scrollHeight - cachedWinH);
+    cachedNavBottom = navShell ? navShell.getBoundingClientRect().bottom : 72;
+    const tops = {};
+    sectionIds.forEach((id) => {
+      const a = anchorOf(id);
+      if (a) tops[id] = absTop(a);
+    });
+    cachedSectionTops = tops;
   }
 
   let activeId = null;
@@ -252,13 +304,12 @@ function initScrollMechanics() {
 
   function detectSection() {
     const y = window.scrollY || document.documentElement.scrollTop;
-    const docMax = document.documentElement.scrollHeight - window.innerHeight;
-    if (docMax > 0 && y >= docMax - 6) return sectionIds[sectionIds.length - 1];
-    const line = y + navBottom() + window.innerHeight * 0.28;
+    if (cachedDocMax > 0 && y >= cachedDocMax - 6) return sectionIds[sectionIds.length - 1];
+    const line = y + cachedNavBottom + cachedWinH * 0.28;
     let current = null;
     sectionIds.forEach((id) => {
-      const a = anchorOf(id);
-      if (a && absTop(a) <= line) current = id;
+      const top = cachedSectionTops[id];
+      if (typeof top === 'number' && top <= line) current = id;
     });
     return current;
   }
@@ -289,14 +340,12 @@ function initScrollMechanics() {
   function updateScrollUI() {
     // Batch all DOM reads before any style/class writes to prevent layout thrashing
     const y = window.scrollY || document.documentElement.scrollTop;
-    const winH = window.innerHeight;
-    const docHeight = document.documentElement.scrollHeight - winH;
-    const pct = docHeight > 0 ? Math.min(100, Math.max(0, (y / docHeight) * 100)) : 0;
+    const ratio = cachedDocMax > 0 ? Math.min(1, Math.max(0, y / cachedDocMax)) : 0;
     const contrast = computeNavContrast(y);
     const foundSection = !locked ? detectSection() : null;
     const tRect = timelineContainer && eduRail ? timelineContainer.getBoundingClientRect() : null;
 
-    if (progressBar) progressBar.style.width = `${pct.toFixed(2)}%`;
+    if (progressBar) progressBar.style.transform = `scaleX(${ratio.toFixed(4)})`;
     applyNavContrast(contrast);
 
     if (!locked && foundSection !== activeId) {
@@ -308,15 +357,14 @@ function initScrollMechanics() {
     }
 
     if (tRect && eduRail) {
-      const start = winH * 0.84;
-      const end = winH * 0.28;
+      const start = cachedWinH * 0.84;
+      const end = cachedWinH * 0.28;
       const progress = Math.min(
         1,
         Math.max(0, (start - tRect.top) / (start - end + tRect.height * 0.45))
       );
-      eduRail.style.height = `${(progress * 100).toFixed(1)}%`;
-      const eduNodes = document.querySelectorAll('#education-entries .timeline-node');
-      eduNodes.forEach((node, idx) => {
+      eduRail.style.transform = `scaleY(${progress.toFixed(4)})`;
+      cachedEduNodes.forEach((node, idx) => {
         node.classList.toggle('is-reached', progress >= (idx === 0 ? 0.08 : 0.56));
       });
     }
@@ -372,15 +420,18 @@ function initScrollMechanics() {
   });
 
   window.addEventListener('resize', () => {
+    refreshScrollCaches();
     placePill();
     updateScrollUI();
     const activeFilter = document.querySelector('.filter-tab[aria-selected="true"]');
     if (activeFilter) positionFilterPill(activeFilter);
-  });
+  }, { passive: true });
 
   if (document.fonts && document.fonts.ready) {
     document.fonts.ready.then(() => {
+      refreshScrollCaches();
       placePill();
+      updateScrollUI();
       const activeFilter = document.querySelector('.filter-tab[aria-selected="true"]');
       if (activeFilter) positionFilterPill(activeFilter);
     });
@@ -391,6 +442,7 @@ function initScrollMechanics() {
   if (sectionIds.includes(initialHash)) {
     window.addEventListener('load', () => {
       setTimeout(() => {
+        refreshScrollCaches();
         const y = scrollTargetY(initialHash);
         if (y !== null) window.scrollTo({ top: y, behavior: 'auto' });
       }, 250);
@@ -403,15 +455,14 @@ function initScrollMechanics() {
     }
   });
 
-  document.addEventListener('click', (e) => {
-    if (e.target.closest('.filter-tab')) {
-      requestAnimationFrame(() => {
-        refreshScrollCaches();
-        applyNavContrast(computeNavContrast(window.scrollY || document.documentElement.scrollTop));
-      });
-    }
+  document.addEventListener('portfolio:layout-changed', () => {
+    requestAnimationFrame(() => {
+      refreshScrollCaches();
+      updateScrollUI();
+    });
   });
 
+  refreshScrollCaches();
   updateScrollUI();
 }
 
@@ -557,6 +608,7 @@ function selectSkill(skillName) {
 
   renderSkillLinkedProjects(skillName);
   if (drawer) drawer.classList.add('open');
+  document.dispatchEvent(new CustomEvent('portfolio:layout-changed'));
 }
 
 function clearSelectedSkill() {
@@ -566,6 +618,7 @@ function clearSelectedSkill() {
     pill.classList.remove('skill-pill-active');
   });
   if (drawer) drawer.classList.remove('open');
+  document.dispatchEvent(new CustomEvent('portfolio:layout-changed'));
 }
 
 function toggleNote(idx) {
@@ -583,6 +636,7 @@ function toggleNote(idx) {
   if (trigger) {
     trigger.setAttribute('aria-expanded', String(!isOpen));
   }
+  document.dispatchEvent(new CustomEvent('portfolio:layout-changed'));
 }
 
 /**
@@ -748,7 +802,18 @@ function initLiquidChromeSculpture() {
     { passive: true }
   );
 
-  window.addEventListener('scroll', refreshRects, { passive: true });
+  let scrollRectRaf = null;
+  window.addEventListener(
+    'scroll',
+    () => {
+      if (!inViewport || scrollRectRaf) return;
+      scrollRectRaf = requestAnimationFrame(() => {
+        scrollRectRaf = null;
+        refreshRects();
+      });
+    },
+    { passive: true }
+  );
   window.addEventListener('resize', resizeCanvas, { passive: true });
   window.addEventListener(
     'orientationchange',
@@ -773,14 +838,6 @@ function initLiquidChromeSculpture() {
   function animate() {
     rafId = null;
     if (!inViewport || document.hidden || document.body.classList.contains('modal-open')) return;
-
-    // Self-heal if mobile browser layout/dvh settled after resize/orientationchange
-    if (
-      Math.abs(canvas.clientWidth - canvasWidth) > 1 ||
-      Math.abs(canvas.clientHeight - canvasHeight) > 1
-    ) {
-      resizeCanvas();
-    }
 
     if (!prefersReducedMotion) {
       time += 0.012 + pointer.velocity * 0.012;
@@ -971,6 +1028,7 @@ export function initInteractions({ onOpenProject, onOpenCv, onCopyText }) {
       if (activeTab) positionFilterPill(activeTab);
       renderProjects(category);
       bindRowSpotlights();
+      document.dispatchEvent(new CustomEvent('portfolio:layout-changed'));
     }
 
     filterBar.addEventListener('click', (e) => {

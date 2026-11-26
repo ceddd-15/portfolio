@@ -685,7 +685,7 @@ function mountComProgKiosk(container, { onToast } = {}) {
         break;
     }
 
-    render();
+    render(true);
   }
 
   function getQuickActions() {
@@ -769,7 +769,8 @@ function mountComProgKiosk(container, { onToast } = {}) {
     }
   }
 
-  function render() {
+  function render(preserveFocus = false) {
+    const hadInputFocus = preserveFocus && document.activeElement && document.activeElement.id === 'comprog-input';
     const isExited = state.screen === 'exited';
     const filePreview =
       state.records.length === 0
@@ -879,6 +880,9 @@ function mountComProgKiosk(container, { onToast } = {}) {
         e.preventDefault();
         handleCommand(input.value);
       });
+      if (hadInputFocus) {
+        input.focus({ preventScroll: true });
+      }
     }
   }
 
@@ -1552,7 +1556,7 @@ function mountMemoreRpgCli(container) {
     }
 
     if (handled) state.turns += 1;
-    render();
+    render(true);
   }
 
   function getContextualChips() {
@@ -1593,7 +1597,8 @@ function mountMemoreRpgCli(container) {
     return [];
   }
 
-  function render() {
+  function render(preserveFocus = false) {
+    const hadInputFocus = preserveFocus && document.activeElement && document.activeElement.id === 'memore-input';
     const isMenuOrDone = state.phase === 'exited' || state.phase === 'summary';
     const roomObj = currentRoom();
     const ways = state.phase === 'playing' ? waysOut() : [];
@@ -1709,6 +1714,9 @@ function mountMemoreRpgCli(container) {
         e.preventDefault();
         handleCommand(input.value);
       });
+      if (hadInputFocus) {
+        input.focus({ preventScroll: true });
+      }
     }
   }
 
