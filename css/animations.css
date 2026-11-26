@@ -6,13 +6,11 @@
 @keyframes kineticRise {
   0% {
     opacity: 0;
-    transform: translateY(22px) scale(0.985);
-    filter: blur(6px);
+    transform: translate3d(0, 22px, 0) scale(0.985);
   }
   100% {
     opacity: 1;
-    transform: translateY(0) scale(1);
-    filter: blur(0);
+    transform: translate3d(0, 0, 0) scale(1);
   }
 }
 
@@ -55,7 +53,7 @@
 }
 
 .chrome-sheen-animate {
-  animation: chromeSheen 9s ease-in-out infinite;
+  animation: chromeSheen 6s ease-in-out 1;
 }
 
 /* Specular Border Shimmer on Hover */
@@ -120,37 +118,30 @@
     background-color 0.25s ease,
     border-color 0.25s ease,
     filter 0.25s ease;
-  will-change: transform;
 }
 
 /* Scroll Reveal Sections: in & out combo animation (fade + directional slide + scale) */
 .reveal-section {
   opacity: 0;
   transform: translate3d(calc(var(--reveal-x, 0px) * 0.35), 28px, 0) scale(0.985);
-  filter: blur(3px);
   transition:
-    opacity 0.65s var(--ease-expo),
-    transform 0.72s var(--ease-expo),
-    filter 0.55s ease;
-  will-change: opacity, transform;
+    opacity 0.6s var(--ease-expo),
+    transform 0.68s var(--ease-expo);
 }
 
 .reveal-section.is-visible {
   opacity: 1;
   transform: translate3d(0, 0, 0) scale(1);
-  filter: blur(0);
 }
 
 .reveal-section.is-exiting[data-exit='up'] {
   opacity: 0;
   transform: translate3d(calc(var(--reveal-x, 0px) * -0.35), -28px, 0) scale(0.985);
-  filter: blur(3px);
 }
 
 .reveal-section.is-exiting[data-exit='down'] {
   opacity: 0;
   transform: translate3d(calc(var(--reveal-x, 0px) * 0.35), 28px, 0) scale(0.985);
-  filter: blur(3px);
 }
 
 .reveal-section[data-reveal='left'] {
@@ -254,7 +245,7 @@
 .hero-headline .wipe-line {
   animation:
     lineWipe 1s cubic-bezier(0.7, 0, 0.2, 1) both,
-    chromeSheen 9s ease-in-out 1.4s infinite;
+    chromeSheen 6s ease-in-out 1.4s 1;
 }
 
 .hero-headline .wipe-line-1 {

@@ -73,7 +73,35 @@ function initCursorAmbientGlow() {
   let targetY = window.innerHeight * 0.35;
   let currentX = targetX;
   let currentY = targetY;
+  let hw = glow.offsetWidth / 2 || 256;
+  let hh = glow.offsetHeight / 2 || 256;
   let visible = false;
+  let rafId = null;
+
+  function tickGlow() {
+    rafId = null;
+    const dx = targetX - currentX;
+    const dy = targetY - currentY;
+    currentX += dx * 0.14;
+    currentY += dy * 0.14;
+    glow.style.transform = `translate3d(${(currentX - hw).toFixed(1)}px, ${(currentY - hh).toFixed(1)}px, 0)`;
+    if (visible && (Math.abs(dx) > 0.3 || Math.abs(dy) > 0.3)) {
+      rafId = requestAnimationFrame(tickGlow);
+    }
+  }
+
+  function startGlowLoop() {
+    if (!rafId) rafId = requestAnimationFrame(tickGlow);
+  }
+
+  window.addEventListener(
+    'resize',
+    () => {
+      hw = glow.offsetWidth / 2 || 256;
+      hh = glow.offsetHeight / 2 || 256;
+    },
+    { passive: true }
+  );
 
   window.addEventListener(
     'mousemove',
@@ -84,6 +112,7 @@ function initCursorAmbientGlow() {
         visible = true;
         glow.style.opacity = '1';
       }
+      startGlowLoop();
     },
     { passive: true }
   );
@@ -92,17 +121,6 @@ function initCursorAmbientGlow() {
     visible = false;
     glow.style.opacity = '0';
   });
-
-  function tickGlow() {
-    currentX += (targetX - currentX) * 0.11;
-    currentY += (targetY - currentY) * 0.11;
-    const hw = glow.offsetWidth / 2;
-    const hh = glow.offsetHeight / 2;
-    glow.style.transform = `translate3d(${(currentX - hw).toFixed(1)}px, ${(currentY - hh).toFixed(1)}px, 0)`;
-    requestAnimationFrame(tickGlow);
-  }
-
-  tickGlow();
 }
 
 function initScrollMechanics() {
@@ -121,8 +139,8 @@ function initScrollMechanics() {
   const occluderSelector = [
     '.hero-eyebrow',
     '.hero-headline',
-    '.hero-lead',
-    '.hero-actions',
+    '.hero-summary',
+    '.hero-cta-row',
     '.hero-metrics',
     '.eyebrow',
     '.section-title',
@@ -130,19 +148,19 @@ function initScrollMechanics() {
     '.header-hint',
     '.filter-bar',
     '.index-list-meta',
-    '.project-title',
-    '.project-meta',
-    '.project-desc',
-    '.project-stack',
-    '.skill-title',
-    '.skill-item',
-    '.note-title',
-    '.note-body',
-    '.timeline-title',
-    '.timeline-meta',
-    '.timeline-detail',
-    '.timeline-bullet'
+    '.project-index-row',
+    '.skills-grid',
+    '.note-item',
+    '.timeline-entry'
   ].join(', ');
+
+  let cachedSurfaces = Array.from(document.querySelectorAll('.section-glass-surface'));
+  let cachedOccluders = Array.from(document.querySelectorAll(occluderSelector));
+
+  function refreshScrollCaches() {
+    cachedSurfaces = Array.from(document.querySelectorAll('.section-glass-surface'));
+    cachedOccluders = Array.from(document.querySelectorAll(occluderSelector));
+  }
 
   let activeId = null;
   let locked = false;
@@ -153,13 +171,12 @@ function initScrollMechanics() {
     return a.bottom > b.top - padY && a.top < b.bottom + padY && a.right > b.left && a.left < b.right;
   }
 
-  function updateNavContrast(scrollY) {
-    if (!navShell) return;
+  function computeNavContrast(scrollY) {
+    if (!navShell) return { overSurface: false, isOccluding: false };
     const nr = navShell.getBoundingClientRect();
     let overSurface = scrollY > 36;
     if (!overSurface) {
-      const surfaces = document.querySelectorAll('.section-glass-surface');
-      for (const surf of surfaces) {
+      for (const surf of cachedSurfaces) {
         if (rectsOverlap(surf.getBoundingClientRect(), nr, 2)) {
           overSurface = true;
           break;
@@ -168,26 +185,20 @@ function initScrollMechanics() {
     }
 
     let isOccluding = false;
-    const occluders = document.querySelectorAll(occluderSelector);
-    for (const el of occluders) {
-      if (el.offsetParent === null) continue;
+    for (const el of cachedOccluders) {
+      const sec = el.closest('.reveal-section');
+      if (sec && !sec.classList.contains('is-visible') && !sec.classList.contains('is-exiting')) {
+        continue;
+      }
       const r = el.getBoundingClientRect();
       if (r.width === 0 || r.height === 0) continue;
-      if (!rectsOverlap(r, nr, 5)) continue;
-      const sec = el.closest('.reveal-section');
-      if (sec && !sec.classList.contains('is-visible')) {
-        const op = parseFloat(window.getComputedStyle(sec).opacity);
-        if (Number.isFinite(op) && op <= 0.08) continue;
+      if (rectsOverlap(r, nr, 5)) {
+        isOccluding = true;
+        break;
       }
-      isOccluding = true;
-      break;
     }
 
-    navShell.classList.toggle('is-over-surface', overSurface);
-    navShell.classList.toggle('is-occluding', isOccluding);
-    if (siteHeader) {
-      siteHeader.classList.toggle('is-occluding', isOccluding);
-    }
+    return { overSurface, isOccluding };
   }
 
   // Layout-based offset (ignores reveal transforms so targets stay pixel-precise)
@@ -266,28 +277,39 @@ function initScrollMechanics() {
     setActive(id);
   }
 
+  function applyNavContrast({ overSurface, isOccluding }) {
+    if (!navShell) return;
+    navShell.classList.toggle('is-over-surface', overSurface);
+    navShell.classList.toggle('is-occluding', isOccluding);
+    if (siteHeader) {
+      siteHeader.classList.toggle('is-occluding', isOccluding);
+    }
+  }
+
   function updateScrollUI() {
+    // Batch all DOM reads before any style/class writes to prevent layout thrashing
     const y = window.scrollY || document.documentElement.scrollTop;
-    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+    const winH = window.innerHeight;
+    const docHeight = document.documentElement.scrollHeight - winH;
     const pct = docHeight > 0 ? Math.min(100, Math.max(0, (y / docHeight) * 100)) : 0;
+    const contrast = computeNavContrast(y);
+    const foundSection = !locked ? detectSection() : null;
+    const tRect = timelineContainer && eduRail ? timelineContainer.getBoundingClientRect() : null;
 
     if (progressBar) progressBar.style.width = `${pct.toFixed(2)}%`;
+    applyNavContrast(contrast);
 
-    updateNavContrast(y);
-
-    if (!locked) {
-      const found = detectSection();
-      if (found !== activeId) setActive(found);
+    if (!locked && foundSection !== activeId) {
+      setActive(foundSection);
     }
 
     if (sculpture && !reduceMotion) {
       sculpture.style.setProperty('--pan-y', `${(-Math.min(y, 700) * 0.06).toFixed(1)}px`);
     }
 
-    if (timelineContainer && eduRail) {
-      const tRect = timelineContainer.getBoundingClientRect();
-      const start = window.innerHeight * 0.84;
-      const end = window.innerHeight * 0.28;
+    if (tRect && eduRail) {
+      const start = winH * 0.84;
+      const end = winH * 0.28;
       const progress = Math.min(
         1,
         Math.max(0, (start - tRect.top) / (start - end + tRect.height * 0.45))
@@ -373,14 +395,15 @@ function initScrollMechanics() {
 
   document.addEventListener('transitionend', (e) => {
     if (e.target.classList && e.target.classList.contains('reveal-section')) {
-      updateNavContrast(window.scrollY || document.documentElement.scrollTop);
+      applyNavContrast(computeNavContrast(window.scrollY || document.documentElement.scrollTop));
     }
   });
 
   document.addEventListener('click', (e) => {
     if (e.target.closest('.filter-tab')) {
       requestAnimationFrame(() => {
-        updateNavContrast(window.scrollY || document.documentElement.scrollTop);
+        refreshScrollCaches();
+        applyNavContrast(computeNavContrast(window.scrollY || document.documentElement.scrollTop));
       });
     }
   });
@@ -516,11 +539,15 @@ function initLiquidChromeSculpture() {
   if (!ctx) return;
 
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const isCoarse = window.matchMedia('(pointer: coarse)').matches;
+  const slices = isCoarse ? 34 : 46;
   let containerWidth = 0;
   let containerHeight = 0;
   let canvasWidth = 0;
   let canvasHeight = 0;
-  let dpr = Math.min(window.devicePixelRatio || 1, 2);
+  let dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+  let inViewport = true;
+  let rafId = null;
 
   const pointer = {
     x: 0.3,
@@ -541,7 +568,7 @@ function initLiquidChromeSculpture() {
     containerHeight = Math.max(1, containerRect.height);
     canvasWidth = Math.max(1, canvasRect.width);
     canvasHeight = Math.max(1, canvasRect.height);
-    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    dpr = Math.min(window.devicePixelRatio || 1, 1.5);
     canvas.width = Math.floor(canvasWidth * dpr);
     canvas.height = Math.floor(canvasHeight * dpr);
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -648,7 +675,6 @@ function initLiquidChromeSculpture() {
       }
     }
 
-    const slices = 58;
     for (let i = 0; i < slices; i++) {
       const u = (i / slices) * Math.PI * 2;
       const phase = u + time * 0.52;
@@ -724,9 +750,47 @@ function initLiquidChromeSculpture() {
       ctx.restore();
     });
 
-    if (!prefersReducedMotion) {
-      requestAnimationFrame(animate);
+    rafId = null;
+    if (!prefersReducedMotion && inViewport && !document.hidden && !document.body.classList.contains('modal-open')) {
+      rafId = requestAnimationFrame(animate);
     }
+  }
+
+  function startSculpture() {
+    if (!rafId && !prefersReducedMotion && inViewport && !document.hidden && !document.body.classList.contains('modal-open')) {
+      rafId = requestAnimationFrame(animate);
+    }
+  }
+
+  if ('IntersectionObserver' in window) {
+    const visObserver = new IntersectionObserver(
+      (entries) => {
+        inViewport = entries[0] ? entries[0].isIntersecting : true;
+        if (inViewport) startSculpture();
+        else if (rafId) {
+          cancelAnimationFrame(rafId);
+          rafId = null;
+        }
+      },
+      { rootMargin: '120px 0px' }
+    );
+    visObserver.observe(container);
+  }
+
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) startSculpture();
+  });
+
+  if (typeof MutationObserver !== 'undefined') {
+    const modalObserver = new MutationObserver(() => {
+      if (document.body.classList.contains('modal-open') && rafId) {
+        cancelAnimationFrame(rafId);
+        rafId = null;
+      } else {
+        startSculpture();
+      }
+    });
+    modalObserver.observe(document.body, { attributes: true, attributeFilter: ['class'] });
   }
 
   animate();

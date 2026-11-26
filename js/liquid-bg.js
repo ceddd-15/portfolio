@@ -195,17 +195,19 @@ function startWebGLRenderer(canvas, prefersReducedMotion) {
   const uMouse = gl.getUniformLocation(program, 'uMouse');
 
   const mouse = { x: 0.35, y: 0.32, targetX: 0.35, targetY: 0.32 };
+  const isCoarse = window.matchMedia('(pointer: coarse)').matches;
+  const minFrameMs = isCoarse ? 33 : 16;
   let rafId = null;
   let running = true;
+  let lastDrawTime = 0;
   const startTime = performance.now();
 
   function resize() {
-    // Adaptive render scale: crisp on desktops, capped pixel budget on phones/tablets
+    // Low-frequency liquid silk upscales cleanly via bilinear filtering; cap pixel budget aggressively
     const cssW = Math.max(1, window.innerWidth);
     const cssH = Math.max(1, window.innerHeight);
-    const coarse = window.matchMedia('(pointer: coarse)').matches;
-    const maxPixels = coarse ? 0.9e6 : 2.2e6;
-    const dprCap = Math.min(window.devicePixelRatio || 1, 1.5);
+    const maxPixels = isCoarse ? 0.34e6 : 0.65e6;
+    const dprCap = isCoarse ? 1.0 : 1.25;
     const scale = Math.min(dprCap, Math.sqrt(maxPixels / (cssW * cssH)));
     const width = Math.max(1, Math.floor(cssW * scale));
     const height = Math.max(1, Math.floor(cssH * scale));
@@ -229,8 +231,26 @@ function startWebGLRenderer(canvas, prefersReducedMotion) {
     }
   }
 
+  function shouldPause() {
+    return !running || document.hidden || document.body.classList.contains('modal-open');
+  }
+
+  function scheduleNext() {
+    if (!prefersReducedMotion && !shouldPause() && !rafId) {
+      rafId = requestAnimationFrame(renderFrame);
+    }
+  }
+
   function renderFrame(now) {
-    if (!running) return;
+    rafId = null;
+    if (shouldPause()) return;
+
+    if (!prefersReducedMotion && now - lastDrawTime < minFrameMs) {
+      scheduleNext();
+      return;
+    }
+    lastDrawTime = now;
+
     mouse.x += (mouse.targetX - mouse.x) * 0.09;
     mouse.y += (mouse.targetY - mouse.y) * 0.09;
 
@@ -239,9 +259,7 @@ function startWebGLRenderer(canvas, prefersReducedMotion) {
     gl.uniform2f(uMouse, mouse.x, mouse.y);
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 
-    if (!prefersReducedMotion) {
-      rafId = requestAnimationFrame(renderFrame);
-    }
+    scheduleNext();
   }
 
   resize();
@@ -249,11 +267,27 @@ function startWebGLRenderer(canvas, prefersReducedMotion) {
   window.addEventListener('pointermove', onPointerMove, { passive: true });
   window.addEventListener('touchstart', onTouch, { passive: true });
   window.addEventListener('touchmove', onTouch, { passive: true });
+  document.addEventListener('visibilitychange', () => {
+    if (!shouldPause()) scheduleNext();
+  });
+
+  if (typeof MutationObserver !== 'undefined') {
+    const bodyObserver = new MutationObserver(() => {
+      if (shouldPause() && rafId) {
+        cancelAnimationFrame(rafId);
+        rafId = null;
+      } else {
+        scheduleNext();
+      }
+    });
+    bodyObserver.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+  }
 
   canvas.addEventListener('webglcontextlost', (e) => {
     e.preventDefault();
     running = false;
     if (rafId) cancelAnimationFrame(rafId);
+    rafId = null;
     startCanvas2DFallback(canvas, prefersReducedMotion);
   });
 

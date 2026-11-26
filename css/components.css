@@ -66,7 +66,7 @@
 }
 
 .obsidian-pill-nav {
-  background: rgba(9, 7, 16, 0.74);
+  background: rgba(9, 7, 16, 0.76);
   backdrop-filter: blur(var(--glass-blur-strong));
   -webkit-backdrop-filter: blur(var(--glass-blur-strong));
   border: 1px solid var(--border-specular);
@@ -79,24 +79,19 @@
   gap: 0.75rem;
   box-shadow: var(--shadow-glass);
   transition:
-    background 260ms var(--ease-expo),
-    border-color 260ms var(--ease-expo),
-    box-shadow 260ms var(--ease-expo),
-    backdrop-filter 260ms ease;
+    background 240ms var(--ease-expo),
+    border-color 240ms var(--ease-expo),
+    box-shadow 240ms var(--ease-expo);
 }
 
 .obsidian-pill-nav.is-over-surface {
-  background: rgba(7, 5, 14, 0.88);
-  backdrop-filter: blur(32px) saturate(160%);
-  -webkit-backdrop-filter: blur(32px) saturate(160%);
+  background: rgba(7, 5, 14, 0.9);
   border-color: rgba(216, 180, 254, 0.24);
 }
 
 /* Adaptive high-contrast mode when bright headings or text collide beneath the pill */
 .obsidian-pill-nav.is-occluding {
-  background: linear-gradient(180deg, rgba(5, 4, 10, 0.97) 0%, rgba(12, 8, 22, 0.95) 100%);
-  backdrop-filter: blur(44px) saturate(190%);
-  -webkit-backdrop-filter: blur(44px) saturate(190%);
+  background: linear-gradient(180deg, rgba(5, 4, 10, 0.97) 0%, rgba(12, 8, 22, 0.96) 100%);
   border-color: rgba(233, 213, 255, 0.42);
   box-shadow:
     0 22px 52px -8px rgba(4, 3, 8, 0.98),
@@ -712,9 +707,7 @@
   gap: 0.25rem;
   padding: 0.35rem;
   border-radius: 1rem;
-  background: rgba(9, 7, 16, 0.78);
-  backdrop-filter: blur(var(--glass-blur));
-  -webkit-backdrop-filter: blur(var(--glass-blur));
+  background: rgba(9, 7, 16, 0.86);
   border: 1px solid var(--border-specular);
   width: 100%;
 }

@@ -12,8 +12,8 @@
   --glass-bg: rgba(9, 7, 15, 0.66);
   --glass-bg-strong: rgba(10, 8, 17, 0.84);
   --glass-bg-subtle: rgba(9, 7, 15, 0.44);
-  --glass-blur: 18px;
-  --glass-blur-strong: 24px;
+  --glass-blur: 10px;
+  --glass-blur-strong: 16px;
 
   /* Typography Ink Hierarchy */
   --ink-primary: #f6f3fc;
