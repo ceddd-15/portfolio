@@ -352,8 +352,8 @@
    3. Hero Section (Open Negative Space Over Liquid Chrome Silk)
    -------------------------------------------------------------------------- */
 .hero-section {
-  padding-top: clamp(1.25rem, 2.8vw, 2.25rem);
-  padding-bottom: clamp(2.75rem, 5vw, 4.5rem);
+  padding-top: clamp(0.85rem, 1.8vw, 1.35rem);
+  padding-bottom: clamp(2.5rem, 4.5vw, 4rem);
   overflow-x: clip;
   overflow-y: visible;
 }
@@ -375,7 +375,7 @@
 .hero-copy {
   display: flex;
   flex-direction: column;
-  gap: clamp(1.1rem, 1.8vw, 1.45rem);
+  gap: clamp(0.85rem, 1.35vw, 1.15rem);
   min-width: 0;
   max-width: 100%;
 }
@@ -409,7 +409,7 @@
 .hero-headline {
   font-family: var(--font-display);
   font-weight: 700;
-  font-size: clamp(2.65rem, 6.4vw, 4.75rem);
+  font-size: clamp(2.5rem, 5.4vw, 4.25rem);
   letter-spacing: -0.035em;
   line-height: 0.99;
   text-transform: uppercase;
@@ -470,9 +470,9 @@
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 1.25rem 0;
-  padding-top: 1.5rem;
+  padding-top: 1.05rem;
   border-top: 1px solid var(--border-specular);
-  margin-top: 0.5rem;
+  margin-top: 0.15rem;
   max-width: 31rem;
 }
 
