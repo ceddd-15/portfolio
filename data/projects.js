@@ -67,7 +67,7 @@ export const PROJECTS_DATA = [
   },
   {
     index: '04',
-    category: 'Web & Full-Stack',
+    category: 'Mobile & Desktop',
     title: 'BIOPing_STS-Project',
     repo: 'https://github.com/cedieboy07/BIOPing_STS-Project',
     role: 'Backend Developer · Science, Technology & Society (STS) Prototype',

@@ -11,6 +11,30 @@ import { downloadCvPdf } from './cv-pdf.js';
 let currentInspectProject = null;
 let currentInspectTab = 'overview';
 let toastTimer = null;
+let lastFocusedEl = null;
+
+function getFocusableIn(container) {
+  if (!container) return [];
+  return Array.from(
+    container.querySelectorAll(
+      'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+    )
+  ).filter((el) => !el.classList.contains('hidden') && el.offsetParent !== null);
+}
+
+function focusModal(modalEl) {
+  const focusables = getFocusableIn(modalEl);
+  if (focusables.length > 0) {
+    focusables[0].focus({ preventScroll: true });
+  }
+}
+
+function restoreFocus() {
+  if (lastFocusedEl && typeof lastFocusedEl.focus === 'function' && lastFocusedEl.isConnected) {
+    lastFocusedEl.focus({ preventScroll: true });
+  }
+  lastFocusedEl = null;
+}
 
 export function showToast(message) {
   const toast = document.getElementById('toast-notification');
@@ -132,8 +156,10 @@ export function openInspectModal(projectIndex, initialTab = 'overview') {
 
   const modal = document.getElementById('inspect-modal');
   if (modal) {
+    lastFocusedEl = document.activeElement;
     modal.classList.remove('hidden');
     document.body.classList.add('modal-open');
+    requestAnimationFrame(() => focusModal(modal));
   }
 }
 
@@ -143,13 +169,16 @@ export function closeInspectModal() {
   modal.classList.add('hidden');
   document.body.classList.remove('modal-open');
   currentInspectProject = null;
+  restoreFocus();
 }
 
 export function openCvModal() {
   const modal = document.getElementById('cv-modal');
   if (!modal) return;
+  lastFocusedEl = document.activeElement;
   modal.classList.remove('hidden');
   document.body.classList.add('modal-open');
+  requestAnimationFrame(() => focusModal(modal));
 }
 
 export function closeCvModal() {
@@ -157,6 +186,7 @@ export function closeCvModal() {
   if (!modal || modal.classList.contains('hidden')) return;
   modal.classList.add('hidden');
   document.body.classList.remove('modal-open');
+  restoreFocus();
 }
 
 export function initModals() {
@@ -221,6 +251,23 @@ export function initModals() {
     if (e.key === 'Escape') {
       closeInspectModal();
       closeCvModal();
+      return;
+    }
+
+    if (e.key === 'Tab') {
+      const openModal = [inspectModal, cvModal].find((m) => m && !m.classList.contains('hidden'));
+      if (!openModal) return;
+      const focusables = getFocusableIn(openModal);
+      if (focusables.length === 0) return;
+      const first = focusables[0];
+      const last = focusables[focusables.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
     }
   });
 }

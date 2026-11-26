@@ -479,8 +479,17 @@ function initMobileMenu() {
     link.addEventListener('click', closeMenu);
   });
 
+  document.addEventListener('click', (e) => {
+    if (!menu.classList.contains('hidden') && !menu.contains(e.target) && !btn.contains(e.target)) {
+      closeMenu();
+    }
+  });
+
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') closeMenu();
+    if (e.key === 'Escape' && !menu.classList.contains('hidden')) {
+      closeMenu();
+      btn.focus({ preventScroll: true });
+    }
   });
 }
 

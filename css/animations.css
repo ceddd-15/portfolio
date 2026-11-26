@@ -475,8 +475,26 @@
 }
 
 @media (pointer: coarse) {
-  .section-glass-surface::before {
+  .section-glass-surface::before,
+  .reveal-section .section-title::after {
     display: none;
+  }
+
+  .reveal-section .section-title {
+    opacity: 1;
+    overflow: visible;
+  }
+
+  .reveal-section.is-visible .section-title {
+    animation: fadeUp 0.65s var(--ease-expo) 0.12s both;
+  }
+
+  .reveal-section.is-visible .filter-bar {
+    animation: fadeUp 0.65s var(--ease-expo) 0.25s both;
+  }
+
+  .row-enter {
+    animation: fadeUp 0.48s var(--ease-expo) both;
   }
 }
 

@@ -825,7 +825,7 @@ function mountComProgKiosk(container, { onToast } = {}) {
                         id="comprog-input"
                         type="text"
                         class="cli-input"
-                        placeholder="Type input and press Enter..."
+                        placeholder="Type choice..."
                         autocomplete="off"
                       />
                       <button type="submit" class="store-add-btn">Enter</button>
@@ -1646,12 +1646,12 @@ function mountMemoreRpgCli(container) {
                         class="cli-input"
                         placeholder="${
                           state.phase === 'char-name'
-                            ? 'Enter character name (e.g. Ceddd)...'
+                            ? 'Enter name...'
                             : state.phase === 'char-pronouns'
                               ? 'Choose 1, 2, or 3...'
                               : state.mode === 'dialogue'
-                                ? 'Choose reply number...'
-                                : 'Type command (LOOK AROUND, TAKE, USE, GO TO, TALK TO)...'
+                                ? 'Reply number...'
+                                : 'Enter command...'
                         }"
                         autocomplete="off"
                       />
