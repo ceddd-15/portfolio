@@ -750,6 +750,22 @@ function initLiquidChromeSculpture() {
 
   window.addEventListener('scroll', refreshRects, { passive: true });
   window.addEventListener('resize', resizeCanvas, { passive: true });
+  window.addEventListener(
+    'orientationchange',
+    () => {
+      requestAnimationFrame(resizeCanvas);
+      setTimeout(resizeCanvas, 180);
+    },
+    { passive: true }
+  );
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', resizeCanvas, { passive: true });
+  }
+  if ('ResizeObserver' in window) {
+    const ro = new ResizeObserver(() => resizeCanvas());
+    ro.observe(container);
+    ro.observe(canvas);
+  }
   resizeCanvas();
 
   let time = 0;
@@ -757,6 +773,14 @@ function initLiquidChromeSculpture() {
   function animate() {
     rafId = null;
     if (!inViewport || document.hidden || document.body.classList.contains('modal-open')) return;
+
+    // Self-heal if mobile browser layout/dvh settled after resize/orientationchange
+    if (
+      Math.abs(canvas.clientWidth - canvasWidth) > 1 ||
+      Math.abs(canvas.clientHeight - canvasHeight) > 1
+    ) {
+      resizeCanvas();
+    }
 
     if (!prefersReducedMotion) {
       time += 0.012 + pointer.velocity * 0.012;
