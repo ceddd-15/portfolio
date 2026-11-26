@@ -474,6 +474,12 @@
   }
 }
 
+@media (pointer: coarse) {
+  .section-glass-surface::before {
+    display: none;
+  }
+}
+
 /* Reduced Motion Respect */
 @media (prefers-reduced-motion: reduce) {
   html {

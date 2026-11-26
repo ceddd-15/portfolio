@@ -196,20 +196,21 @@ function startWebGLRenderer(canvas, prefersReducedMotion) {
 
   const mouse = { x: 0.35, y: 0.32, targetX: 0.35, targetY: 0.32 };
   const isCoarse = window.matchMedia('(pointer: coarse)').matches;
-  const isPhoneSized = isCoarse && Math.min(window.innerWidth, window.innerHeight) < 600;
-  const minFrameMs = isPhoneSized ? 28 : 16;
+  const lowCore = typeof navigator.hardwareConcurrency === 'number' && navigator.hardwareConcurrency <= 4;
+  const isMobileGpu = isCoarse || lowCore;
+  const minFrameMs = isMobileGpu ? 42 : 16;
   let rafId = null;
   let running = true;
   let lastDrawTime = 0;
+  let scrollPauseUntil = 0;
   const startTime = performance.now();
 
   function resize() {
-    // Low-frequency liquid silk upscales cleanly via bilinear filtering; cap pixel budget per device tier
+    // Low-frequency liquid silk upscales cleanly via bilinear filtering; protect low-core mobile GPUs
     const cssW = Math.max(1, window.innerWidth);
     const cssH = Math.max(1, window.innerHeight);
-    const phoneNow = isCoarse && Math.min(cssW, cssH) < 600;
-    const maxPixels = phoneNow ? 0.36e6 : 0.72e6;
-    const dprCap = phoneNow ? 1.0 : 1.25;
+    const maxPixels = isMobileGpu ? 0.22e6 : 0.55e6;
+    const dprCap = isMobileGpu ? 1.0 : 1.2;
     const scale = Math.min(dprCap, Math.sqrt(maxPixels / (cssW * cssH)));
     const width = Math.max(1, Math.floor(cssW * scale));
     const height = Math.max(1, Math.floor(cssH * scale));
@@ -247,6 +248,12 @@ function startWebGLRenderer(canvas, prefersReducedMotion) {
     rafId = null;
     if (shouldPause()) return;
 
+    // Yield 100% GPU bandwidth to native scroll compositing on mobile/tablet devices
+    if (isMobileGpu && now < scrollPauseUntil) {
+      scheduleNext();
+      return;
+    }
+
     if (!prefersReducedMotion && now - lastDrawTime < minFrameMs) {
       scheduleNext();
       return;
@@ -256,7 +263,7 @@ function startWebGLRenderer(canvas, prefersReducedMotion) {
     mouse.x += (mouse.targetX - mouse.x) * 0.09;
     mouse.y += (mouse.targetY - mouse.y) * 0.09;
 
-    const elapsed = prefersReducedMotion ? 1.8 : (now - startTime) * 0.001;
+    const elapsed = prefersReducedMotion ? 1.8 : ((now - startTime) * 0.001) % 628.318;
     gl.uniform1f(uTime, elapsed);
     gl.uniform2f(uMouse, mouse.x, mouse.y);
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
@@ -269,6 +276,15 @@ function startWebGLRenderer(canvas, prefersReducedMotion) {
   window.addEventListener('pointermove', onPointerMove, { passive: true });
   window.addEventListener('touchstart', onTouch, { passive: true });
   window.addEventListener('touchmove', onTouch, { passive: true });
+  if (isMobileGpu) {
+    window.addEventListener(
+      'scroll',
+      () => {
+        scrollPauseUntil = performance.now() + 140;
+      },
+      { passive: true }
+    );
+  }
   document.addEventListener('visibilitychange', () => {
     if (!shouldPause()) scheduleNext();
   });

@@ -540,14 +540,16 @@ function initLiquidChromeSculpture() {
 
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const isCoarse = window.matchMedia('(pointer: coarse)').matches;
-  const slices = isCoarse ? 34 : 46;
+  const slices = isCoarse ? 26 : 46;
+  const minFrameMs = isCoarse ? 33 : 0;
   let containerWidth = 0;
   let containerHeight = 0;
   let canvasWidth = 0;
   let canvasHeight = 0;
-  let dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+  let dpr = Math.min(window.devicePixelRatio || 1, isCoarse ? 1 : 1.5);
   let inViewport = true;
   let rafId = null;
+  let lastDrawTime = 0;
 
   const pointer = {
     x: 0.3,
@@ -568,7 +570,7 @@ function initLiquidChromeSculpture() {
     containerHeight = Math.max(1, containerRect.height);
     canvasWidth = Math.max(1, canvasRect.width);
     canvasHeight = Math.max(1, canvasRect.height);
-    dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+    dpr = Math.min(window.devicePixelRatio || 1, isCoarse ? 1 : 1.5);
     canvas.width = Math.floor(canvasWidth * dpr);
     canvas.height = Math.floor(canvasHeight * dpr);
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -635,9 +637,18 @@ function initLiquidChromeSculpture() {
   resizeCanvas();
 
   let time = 0;
-  function animate() {
+  function animate(now = performance.now()) {
+    rafId = null;
+    if (!inViewport || document.hidden || document.body.classList.contains('modal-open')) return;
+
+    if (minFrameMs > 0 && now - lastDrawTime < minFrameMs) {
+      rafId = requestAnimationFrame(animate);
+      return;
+    }
+    lastDrawTime = now;
+
     if (!prefersReducedMotion) {
-      time += 0.012 + pointer.velocity * 0.012;
+      time += (isCoarse ? 0.018 : 0.012) + pointer.velocity * 0.012;
     }
     pointer.x += (pointer.targetX - pointer.x) * 0.075;
     pointer.y += (pointer.targetY - pointer.y) * 0.075;
