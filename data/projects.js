@@ -68,7 +68,7 @@ export const PROJECTS_DATA = [
     summary:
       'Developed the monthly spending overview module in a Java desktop application built in NetBeans for the Object-Oriented Programming course.',
     stack: ['Java', 'NetBeans', 'Swing', 'OOP'],
-    linkedSkills: ['SQLite'],
+    linkedSkills: ['Java', 'SQLite'],
     preview: null,
     previewImage: null,
   },
@@ -108,9 +108,9 @@ export const PROJECTS_DATA = [
     repo: 'https://github.com/Diggeh/Hakton_TableTop',
     role: 'Connectivity, Assets & QA Co-Lead · Software Engineering 2 Finals',
     summary:
-      'Managed session hosting and multiplayer connectivity, organized game asset pipelines, and executed integrated testing and performance optimization alongside one teammate.',
-    stack: ['Multiplayer Networking', 'Asset Pipeline', 'Integration QA'],
-    linkedSkills: [],
+      'Managed session hosting and multiplayer connectivity, SQLite data persistence, game asset pipelines, and integrated testing and performance optimization alongside one teammate.',
+    stack: ['Multiplayer Networking', 'SQLite', 'Asset Pipeline', 'Integration QA'],
+    linkedSkills: ['SQLite'],
     preview: null,
     previewImage: null,
   },
@@ -136,7 +136,7 @@ export const PROJECTS_DATA = [
     summary:
       "Ported the group's Python RPG project into a standalone C++ build while maintaining shared game data structures and core mechanics.",
     stack: ['C++', 'Python', 'File Parsing', 'CLI'],
-    linkedSkills: ['C++'],
+    linkedSkills: ['C++', 'Python'],
     preview: {
       type: 'memore-rpg-cli',
       label: 'C++ Turn-Based RPG',
@@ -152,7 +152,7 @@ export const PROJECTS_DATA = [
     summary:
       'Developed the Move Library & Recorder module (src/library.py on feature/library) to capture, structure, and store Arnis strike sequences for recognition training.',
     stack: ['Python', 'PyTorch', 'OpenCV', 'Git'],
-    linkedSkills: [],
+    linkedSkills: ['Python'],
     preview: null,
     previewImage: null,
   },

@@ -73,14 +73,17 @@
   }
 
   #cv-printable-sheet .cv-sheet-header {
-    flex-direction: row !important;
-    align-items: flex-end !important;
-    justify-content: space-between !important;
-    padding-bottom: 0.75rem !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    text-align: center !important;
+    justify-content: center !important;
+    gap: 0.2rem !important;
+    border-bottom: none !important;
+    padding-bottom: 0.35rem !important;
   }
 
   #cv-printable-sheet .cv-contact {
-    text-align: right !important;
+    text-align: center !important;
   }
 
   #cv-printable-sheet .cv-entry-row {
@@ -90,12 +93,17 @@
   }
 
   #cv-printable-sheet .cv-name {
-    font-size: 20pt !important;
+    font-size: 16pt !important;
+    color: #1e40af !important;
   }
 
   #cv-printable-sheet .cv-section-title {
     font-size: 9pt !important;
-    letter-spacing: 0.14em !important;
+    letter-spacing: 0.08em !important;
+    color: #1e40af !important;
+    border-bottom: 1px solid #3f3f46 !important;
+    padding-bottom: 2px !important;
+    margin-bottom: 4px !important;
   }
 
   #cv-printable-sheet .cv-summary-text,

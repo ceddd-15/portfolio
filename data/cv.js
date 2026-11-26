@@ -30,7 +30,7 @@ export const CV_DATA = {
       program: 'Science, Technology, Engineering, and Mathematics - STEM',
       metric: 'Cumulative GWA: 95/100',
       period: '2022 - 2024',
-      cvPeriod: '2022-2024',
+      cvPeriod: '2022 - 2024',
       accent: false,
     },
   ],
@@ -50,7 +50,7 @@ export const CV_DATA = {
       category: 'Programming Languages',
       level: 'Intermediate',
       accentLevel: true,
-      items: ['C++', 'HTML', 'CSS', 'JavaScript', 'PHP', 'Kotlin', 'Dart'],
+      items: ['C++', 'Java', 'Python', 'HTML', 'CSS', 'JavaScript', 'PHP', 'Kotlin', 'Dart'],
     },
     {
       category: 'Database Management',

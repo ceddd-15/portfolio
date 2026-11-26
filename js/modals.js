@@ -6,6 +6,7 @@
 
 import { PROJECTS_DATA } from '../data/projects.js';
 import { hasProjectPreview, mountProjectPreview } from './previews.js';
+import { downloadCvPdf } from './cv-pdf.js';
 
 let currentInspectProject = null;
 let currentInspectTab = 'overview';
@@ -164,6 +165,7 @@ export function initModals() {
   const closeInspectBtn = document.getElementById('close-inspect-modal');
   const closeCvBtn = document.getElementById('close-cv-modal');
   const copyRepoBtn = document.getElementById('copy-inspect-repo');
+  const downloadCvBtn = document.getElementById('download-cv-btn');
   const printCvBtn = document.getElementById('print-cv-btn');
   const overviewTabBtn = document.getElementById('inspect-tab-overview');
   const previewTabBtn = document.getElementById('inspect-tab-preview');
@@ -175,6 +177,17 @@ export function initModals() {
     copyRepoBtn.addEventListener('click', () => {
       if (!currentInspectProject) return;
       copyTextToClipboard(currentInspectProject.repo, 'Repository URL copied');
+    });
+  }
+
+  if (downloadCvBtn) {
+    downloadCvBtn.addEventListener('click', () => {
+      try {
+        downloadCvPdf();
+        showToast('Downloading Josh_Cedrick_Corpuz_CV.pdf');
+      } catch {
+        window.print();
+      }
     });
   }
 
